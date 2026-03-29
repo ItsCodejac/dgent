@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { loadConfig, saveConfig, setConfigValue, formatConfigList } from "../config/index.js";
 
 export function registerConfig(program: Command): void {
   const config = program
@@ -9,18 +10,22 @@ export function registerConfig(program: Command): void {
     .command("set <key> <value>")
     .description("Set a config value")
     .action((key: string, value: string) => {
-      console.log(`config set: not implemented yet (${key}=${value})`);
+      const current = loadConfig();
+      const updated = setConfigValue(current, key, value);
+      saveConfig(updated);
+      const display = value === "true" ? true : value === "false" ? false : value;
+      console.log(`Set ${key} = ${String(display)}`);
     });
 
   config
     .command("list")
     .description("Print current config as key=value")
     .action(() => {
-      console.log("config list: not implemented yet");
+      const current = loadConfig();
+      console.log(formatConfigList(current));
     });
 
-  config
-    .action(() => {
-      console.log("Interactive config editor not yet available. Use `dgent config list` and `dgent config set`.");
-    });
+  config.action(() => {
+    console.log("Interactive config editor not yet available. Use `dgent config list` and `dgent config set`.");
+  });
 }
