@@ -14,7 +14,7 @@ None
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation** — npm package scaffold, commander CLI skeleton, config system
+- [x] **Phase 1: Foundation** — npm package scaffold, commander CLI skeleton, config system
 - [ ] **Phase 2: Message Rules** — commit-msg rule implementations with fixture-based testing
 - [ ] **Phase 3: Hook Lifecycle** — dgent init/uninstall, conflict detection, hook scripts, --dry-run
 - [ ] **Phase 4: Diff Transforms** — pre-commit hook with partial staging, consent flow, all default-on diff rules
@@ -94,7 +94,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 3/3 | Complete | 2026-03-28 |
 | 2. Message Rules | 0/3 | Not started | - |
 | 3. Hook Lifecycle | 0/2 | Not started | - |
 | 4. Diff Transforms | 0/3 | Not started | - |
