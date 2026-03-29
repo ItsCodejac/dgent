@@ -25,6 +25,7 @@ import { registerScan } from "./commands/scan.js";
 import { registerStats } from "./commands/stats.js";
 import { registerRules } from "./commands/rules.js";
 import { registerCompletions } from "./commands/completions.js";
+import { registerCheckStaged } from "./commands/check-staged.js";
 import { getBanner, VERSION } from "./ui/brand.js";
 
 // Handle --no-color early, before any colored output is generated
@@ -69,5 +70,6 @@ registerDoctor(program);
 registerRage(program);
 registerHook(program);
 registerCompletions(program);
+registerCheckStaged(program);
 
 program.parse();

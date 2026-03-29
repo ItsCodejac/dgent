@@ -1,40 +1,53 @@
 # dgent integration
 
-dgent (de-agent) is installed on this machine. It cleans AI tells from commits and code via git hooks.
+dgent (de-agent) cleans AI tells from commits and code via git hooks.
 
-## What it does automatically
+## Automatic behavior
 
-dgent runs on every `git commit` via global hooks. You don't need to call it — it handles:
+dgent runs on every `git commit` via global hooks. It handles:
 - Removing Co-Authored-By and Generated-By trailers from commit messages
 - Stripping emoji from commit messages and code comments
 - Normalizing conventional commit format
 - Flagging AI naming patterns (Manager, Handler, Processor suffixes)
 
-## What you should do
-
-Before committing code, run `dgent run --json <file>` on files you've modified to check for tells:
+## Commands for agents
 
 ```bash
-dgent run --json src/path/to/file.ts
+# Check a single file silently (exit 0 = clean, 1 = flags)
+dgent run --check <file>
+
+# Check a file with JSON output (fixes[], flags[], clean boolean)
+dgent run --json <file>
+
+# Scan an entire directory
+dgent scan --json [dir]
+
+# Check only staged files before committing
+dgent check-staged --json
+
+# List all rules and their status
+dgent rules --json
 ```
 
-The JSON output tells you:
-- `clean: true` — no issues
-- `fixes[]` — rules that would auto-fix (these run automatically on commit)
-- `flags[]` — issues to address before committing (naming, catch-rethrow patterns)
+## When to run dgent
 
-Exit codes: 0 = clean or fixes applied (success), 1 = flags found (needs attention)
+Run dgent **after writing code, before committing**:
+1. Write or modify files
+2. Run `dgent check-staged --json` to check staged files, or `dgent run --check <file>` on individual files
+3. Fix any flagged issues
+4. Commit
 
-## When writing code
+## What to avoid
 
-Avoid these patterns that dgent flags:
+These patterns get flagged:
 - Class/function names ending in Manager, Handler, Processor, Service, Factory, Builder, Validator, Controller
 - Identifiers longer than 40 characters
-- Catch blocks that only log and re-throw: `catch (e) { console.error(e); throw e; }`
+- Catch blocks that only log and re-throw
 - Section header comments like `// --- Init ---` in small files
 - Comments that restate the next line of code
 
 ## Configuration
 
-Check current rules: `dgent config list`
-This repo may have overrides in `.dgent.json`.
+- Check current rules: `dgent config list`
+- Repo overrides: `.dgent.json`
+- Exclude paths from scanning: `.dgentignore` (same syntax as `.gitignore`)

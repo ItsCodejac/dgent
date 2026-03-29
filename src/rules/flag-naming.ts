@@ -12,6 +12,14 @@ const DECLARATION_PATTERNS = [
   /\b(?:function|const|let|var)\s+([A-Za-z_$][\w$]*)/,
   // def function_name (Python)
   /\bdef\s+([A-Za-z_][\w]*)/,
+  // Go: func FunctionName, type TypeName struct/interface
+  /\bfunc\s+([A-Za-z_][\w]*)/,
+  /\btype\s+([A-Za-z_][\w]*)\s+(?:struct|interface)\b/,
+  // Rust: fn function_name, pub fn function_name, struct/pub struct, impl, enum
+  /\b(?:pub\s+)?fn\s+([A-Za-z_][\w]*)/,
+  /\b(?:pub\s+)?struct\s+([A-Za-z_][\w]*)/,
+  /\bimpl\s+([A-Za-z_][\w]*)/,
+  /\b(?:pub\s+)?enum\s+([A-Za-z_][\w]*)/,
 ];
 
 const MAX_IDENTIFIER_LENGTH = 40;

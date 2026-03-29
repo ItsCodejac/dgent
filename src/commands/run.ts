@@ -7,6 +7,7 @@ import type { Rule, Flag } from "../rules/index.js";
 import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { printCompact, printRuleResult, printFlag, printSuccess } from "../ui/brand.js";
 import { dim, green, cyan } from "../ui/colors.js";
+import { BINARY_EXTENSIONS } from "../utils/extensions.js";
 
 interface JsonResult {
   file: string | null;
@@ -55,16 +56,7 @@ export function registerRun(program: Command): void {
 
       // Skip binary files
       if (file && file !== "-") {
-        const binaryExts = new Set([
-          ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".svg",
-          ".woff", ".woff2", ".ttf", ".eot", ".otf",
-          ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar", ".tgz",
-          ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-          ".exe", ".dll", ".so", ".dylib", ".o",
-          ".mp3", ".mp4", ".wav", ".avi", ".mov",
-          ".pyc", ".class", ".wasm",
-        ]);
-        if (binaryExts.has(extname(file).toLowerCase())) {
+        if (BINARY_EXTENSIONS.has(extname(file).toLowerCase())) {
           if (options.json) {
             console.log(JSON.stringify({ file, phase: "skipped", clean: true, fixes: [], flags: [] }));
           } else {
@@ -139,6 +131,10 @@ export function registerRun(program: Command): void {
       }
 
       if (options.json) {
+        // When --fix is also set, apply fixes in place before returning JSON
+        if (options.fix && output !== input && file && file !== "-") {
+          writeFileSync(file, output, "utf-8");
+        }
         const jsonResult: JsonResult = {
           file: file ?? null,
           phase,
@@ -151,7 +147,7 @@ export function registerRun(program: Command): void {
             suggestion: f.suggestion,
           })),
         };
-        if (output !== input) {
+        if (output !== input && !options.fix) {
           jsonResult.output = output;
         }
         console.log(JSON.stringify(jsonResult, null, 2));

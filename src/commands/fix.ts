@@ -63,10 +63,15 @@ export function registerFix(program: Command): void {
     .description("Use AI (Anthropic API) to fix flagged issues — requires API key")
     .option("--commit-msg", "Fix a commit message instead of code")
     .option("--dry-run", "Show fixes without applying")
-    .action(async (file: string | undefined, options: { commitMsg?: boolean; dryRun?: boolean }) => {
+    .option("--json", "Output results as JSON")
+    .action(async (file: string | undefined, options: { commitMsg?: boolean; dryRun?: boolean; json?: boolean }) => {
       if (!getApiKey()) {
-        printError("No API key configured.");
-        console.error(`  ${dim("Run")} ${cyan("dgent config set api-key <key>")} ${dim("first.")}`);
+        if (options.json) {
+          console.log(JSON.stringify({ file: file ?? null, fixed: false, changes: [], error: "No API key configured." }));
+        } else {
+          printError("No API key configured.");
+          console.error(`  ${dim("Run")} ${cyan("dgent config set api-key <key>")} ${dim("first.")}`);
+        }
         process.exit(1);
       }
 
@@ -74,7 +79,11 @@ export function registerFix(program: Command): void {
 
       if (file === "-" || !file) {
         if (!file && process.stdin.isTTY) {
-          console.error("Usage: dgent fix <file> or pipe input via stdin");
+          if (options.json) {
+            console.log(JSON.stringify({ file: null, fixed: false, changes: [], error: "Usage: dgent fix <file> or pipe input via stdin" }));
+          } else {
+            console.error("Usage: dgent fix <file> or pipe input via stdin");
+          }
           process.exit(1);
         }
         const chunks: Buffer[] = [];
@@ -86,7 +95,12 @@ export function registerFix(program: Command): void {
         try {
           input = readFileSync(file, "utf-8");
         } catch (err) {
-          printError(`Cannot read ${file}: ${err instanceof Error ? err.message : String(err)}`);
+          const errMsg = `Cannot read ${file}: ${err instanceof Error ? err.message : String(err)}`;
+          if (options.json) {
+            console.log(JSON.stringify({ file, fixed: false, changes: [], error: errMsg }));
+          } else {
+            printError(errMsg);
+          }
           process.exit(1);
         }
       }
@@ -107,16 +121,22 @@ export function registerFix(program: Command): void {
       }
 
       if (allFlags.length === 0) {
-        printCompact(`${green("✓")} ${dim("no flags to fix")}`);
+        if (options.json) {
+          console.log(JSON.stringify({ file: file ?? null, fixed: true, changes: [], error: null }));
+        } else {
+          printCompact(`${green("✓")} ${dim("no flags to fix")}`);
+        }
         return;
       }
 
-      printCompact(`${yellow(`${allFlags.length} flag${allFlags.length > 1 ? "s" : ""}`)} ${dim("→ calling AI")}`);
-      console.error("");
-      for (const flag of allFlags) {
-        printFlag({ ...flag, file });
+      if (!options.json) {
+        printCompact(`${yellow(`${allFlags.length} flag${allFlags.length > 1 ? "s" : ""}`)} ${dim("→ calling AI")}`);
+        console.error("");
+        for (const flag of allFlags) {
+          printFlag({ ...flag, file });
+        }
+        console.error("");
       }
-      console.error("");
 
       // Build prompt
       const skill = loadSkill();
@@ -140,12 +160,29 @@ export function registerFix(program: Command): void {
         );
 
         if (!result) {
-          printWarning("AI could not generate fixes. Address flags manually.");
+          if (options.json) {
+            console.log(JSON.stringify({ file: file ?? null, fixed: false, changes: [], error: "AI could not generate fixes." }));
+            process.exit(1);
+          } else {
+            printWarning("AI could not generate fixes. Address flags manually.");
+          }
           return;
         }
 
         if (result.fixed_message === input) {
-          printCompact(dim("no changes suggested"));
+          if (options.json) {
+            console.log(JSON.stringify({ file: file ?? null, fixed: true, changes: [], error: null }));
+          } else {
+            printCompact(dim("no changes suggested"));
+          }
+          return;
+        }
+
+        if (options.json) {
+          if (!options.dryRun && file && file !== "-") {
+            writeFileSync(file, result.fixed_message, "utf-8");
+          }
+          console.log(JSON.stringify({ file: file ?? null, fixed: true, changes: result.changes, error: null }));
           return;
         }
 
@@ -183,12 +220,29 @@ export function registerFix(program: Command): void {
         );
 
         if (!result) {
-          printWarning("AI could not generate fixes. Address flags manually.");
+          if (options.json) {
+            console.log(JSON.stringify({ file: file ?? null, fixed: false, changes: [], error: "AI could not generate fixes." }));
+            process.exit(1);
+          } else {
+            printWarning("AI could not generate fixes. Address flags manually.");
+          }
           return;
         }
 
         if (result.fixed_code === input) {
-          printCompact(dim("no changes suggested"));
+          if (options.json) {
+            console.log(JSON.stringify({ file: file ?? null, fixed: true, changes: [], error: null }));
+          } else {
+            printCompact(dim("no changes suggested"));
+          }
+          return;
+        }
+
+        if (options.json) {
+          if (!options.dryRun && file && file !== "-") {
+            writeFileSync(file, result.fixed_code, "utf-8");
+          }
+          console.log(JSON.stringify({ file: file ?? null, fixed: true, changes: result.changes, error: null }));
           return;
         }
 

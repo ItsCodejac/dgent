@@ -12,16 +12,7 @@ import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { shouldIgnoreFile } from "../config/ignore-files.js";
 import { dim, green } from "../ui/colors.js";
 import { LOGO_COMPACT } from "../ui/brand.js";
-
-const BINARY_EXTENSIONS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".svg",
-  ".woff", ".woff2", ".ttf", ".eot", ".otf",
-  ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
-  ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-  ".exe", ".dll", ".so", ".dylib", ".o",
-  ".mp3", ".mp4", ".wav", ".avi", ".mov",
-  ".pyc", ".class", ".wasm",
-]);
+import { BINARY_EXTENSIONS } from "../utils/extensions.js";
 
 function isBinary(file: string): boolean {
   return BINARY_EXTENSIONS.has(extname(file).toLowerCase());

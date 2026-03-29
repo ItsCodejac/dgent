@@ -173,9 +173,14 @@ server.registerTool(
   },
   async ({ path }): Promise<ToolResult> => {
     try {
-      const { stderr } = await runDgent(["run", "--fix", path]);
+      // First apply fixes in place
+      await runDgent(["run", "--fix", path]);
+      // Then get the post-fix state as structured JSON
+      const { stdout } = await runDgent(["run", "--json", "--pre-commit", path]);
+      const parsed = tryParseJson(stdout);
       return {
-        content: [{ type: "text" as const, text: stderr || `Fixed: ${path}` }],
+        content: [{ type: "text" as const, text: parsed ? JSON.stringify(parsed, null, 2) : stdout }],
+        structuredContent: parsed ?? undefined,
       };
     } catch (err) {
       return errorResult(`Failed to fix ${path}`, err);

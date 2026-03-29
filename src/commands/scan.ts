@@ -9,23 +9,7 @@ import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { shouldIgnoreFile } from "../config/ignore-files.js";
 import { printCompact, printSuccess, printRuleResult, printFlag } from "../ui/brand.js";
 import { dim, green, yellow, cyan, bold, white, red } from "../ui/colors.js";
-
-const BINARY_EXTENSIONS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".svg",
-  ".woff", ".woff2", ".ttf", ".eot", ".otf",
-  ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar", ".tgz",
-  ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-  ".exe", ".dll", ".so", ".dylib", ".o",
-  ".mp3", ".mp4", ".wav", ".avi", ".mov",
-  ".pyc", ".class", ".wasm",
-]);
-
-const CODE_EXTENSIONS = new Set([
-  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
-  ".py", ".go", ".rs", ".java", ".c", ".cpp", ".h", ".hpp",
-  ".rb", ".swift", ".kt", ".scala", ".cs",
-  ".php", ".lua", ".sh", ".bash", ".zsh",
-]);
+import { BINARY_EXTENSIONS, CODE_EXTENSIONS } from "../utils/extensions.js";
 
 interface FileScanResult {
   file: string;
@@ -182,7 +166,7 @@ export function registerScan(program: Command): void {
           results: results.map((r) => ({
             file: r.file,
             fixes: r.fixes,
-            flags: r.flags.map((f) => ({ rule: f.rule, line: f.line, message: f.message })),
+            flags: r.flags.map((f) => ({ rule: f.rule, line: f.line, message: f.message, suggestion: f.suggestion })),
           })),
         }, null, 2));
         process.exit(totalFlags > 0 ? 1 : 0);
