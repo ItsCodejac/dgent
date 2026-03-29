@@ -28,9 +28,12 @@ import { stripEmojiComments } from "./strip-emoji-comments.js";
 import { flagNaming } from "./flag-naming.js";
 import { flagCatchRethrow } from "./flag-catch-rethrow.js";
 import { rewriteMessage } from "./rewrite-message.js";
+import { stripNoiseComments } from "./strip-noise-comments.js";
+import { stripObviousDocstrings } from "./strip-obvious-docstrings.js";
+import { flagLogBracketing } from "./flag-log-bracketing.js";
 
 export const rules: Rule[] = [
   stripTrailers, stripEmojis, flagMessageTone, normalizeFormat,
   stripSectionHeaders, stripEmojiComments, flagNaming, flagCatchRethrow,
-  rewriteMessage,
+  rewriteMessage, stripNoiseComments, stripObviousDocstrings, flagLogBracketing,
 ];

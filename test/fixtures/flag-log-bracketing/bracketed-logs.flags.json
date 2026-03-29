@@ -1,0 +1,3 @@
+[
+  {"rule": "flag-log-bracketing", "line": 1, "message": "Log bracketing: \"starting data fetch\" / \"done data fetch\" — narrates execution flow"}
+]
