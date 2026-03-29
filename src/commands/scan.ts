@@ -55,7 +55,7 @@ export function registerScan(program: Command): void {
         }
       }
 
-      // Filter to code files only, and respect .dgentignore
+      // Filter to code files only, and respect .jentignore
       files = files.filter((f) => {
         const ext = extname(f).toLowerCase();
         if (!CODE_EXTENSIONS.has(ext) || BINARY_EXTENSIONS.has(ext)) return false;
@@ -194,10 +194,10 @@ export function registerScan(program: Command): void {
         if (options.fix && totalFixes > 0) {
           console.error(`  ${green("✓")} ${dim("fixes applied to")} ${results.filter((r) => r.fixes.length > 0).length} ${dim("files")}`);
         } else if (totalFixes > 0 && !options.fix) {
-          console.error(`  ${dim("Run")} ${cyan("dgent scan --fix")} ${dim("to apply fixes")}`);
+          console.error(`  ${dim("Run")} ${cyan("jent scan --fix")} ${dim("to apply fixes")}`);
         }
         if (totalFlags > 0) {
-          console.error(`  ${dim("Run")} ${cyan("dgent fix <file>")} ${dim("to resolve flags with AI")}`);
+          console.error(`  ${dim("Run")} ${cyan("jent fix <file>")} ${dim("to resolve flags with AI")}`);
         }
       }
     });

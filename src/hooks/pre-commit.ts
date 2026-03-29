@@ -63,8 +63,8 @@ function isWithinRepo(file: string, repoRoot: string): boolean {
 }
 
 export async function handlePreCommit(): Promise<void> {
-  if (process.env.DGENT_SKIP === "1") return;
-  const dryRun = process.env.DGENT_DRY_RUN === "1";
+  if (process.env.JENT_SKIP === "1") return;
+  const dryRun = process.env.JENT_DRY_RUN === "1";
 
   try {
     const config = loadConfig();
@@ -95,7 +95,7 @@ export async function handlePreCommit(): Promise<void> {
     const textFiles = stagedFiles.filter((f) => {
       if (isBinary(f)) return false;
       if (repoRoot && !isWithinRepo(f, repoRoot)) {
-        console.error(`dgent: skipping ${f} (outside repository root)`);
+        console.error(`jent: skipping ${f} (outside repository root)`);
         return false;
       }
       if (shouldIgnoreFile(f)) return false;
@@ -114,7 +114,7 @@ export async function handlePreCommit(): Promise<void> {
 
     if (mixedFiles.length > 0) {
       console.error(
-        `dgent: skipping ${mixedFiles.length} file(s) with mixed staged/unstaged changes:`,
+        `jent: skipping ${mixedFiles.length} file(s) with mixed staged/unstaged changes:`,
       );
       for (const f of mixedFiles) {
         console.error(`  - ${f}`);
@@ -168,7 +168,7 @@ export async function handlePreCommit(): Promise<void> {
         restage(file);
         allFixRules.push(...rulesApplied);
         if (config.output.verbose) {
-          console.error(`dgent: modified ${file} (${rulesApplied.join(", ")})`);
+          console.error(`jent: modified ${file} (${rulesApplied.join(", ")})`);
         }
       }
 
@@ -228,7 +228,7 @@ export async function handlePreCommit(): Promise<void> {
     }
 
     if (!dryRun && allFlags.length > 0) {
-      console.error("dgent: pre-commit flags:");
+      console.error("jent: pre-commit flags:");
       for (const flag of allFlags) {
         console.error(`  ${flag.message}`);
       }
@@ -240,7 +240,7 @@ export async function handlePreCommit(): Promise<void> {
     }
   } catch (err) {
     console.error(
-      `dgent: error in pre-commit hook (${err instanceof Error ? err.message : String(err)})`,
+      `jent: error in pre-commit hook (${err instanceof Error ? err.message : String(err)})`,
     );
   }
 }

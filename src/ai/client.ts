@@ -43,16 +43,16 @@ export async function callSkill<T>(
     if (err instanceof Error && "status" in err) {
       const status = (err as { status: number }).status;
       if (status === 401) {
-        console.error("dgent: invalid API key. Check your key with: dgent config set api-key <key>");
+        console.error("jent: invalid API key. Check your key with: jent config set api-key <key>");
       } else if (status === 429) {
-        console.error("dgent: rate limited by the API. Wait a moment and try again.");
+        console.error("jent: rate limited by the API. Wait a moment and try again.");
       } else {
-        console.error(`dgent: AI API error (HTTP ${status}): ${err.message}`);
+        console.error(`jent: AI API error (HTTP ${status}): ${err.message}`);
       }
     } else if (err instanceof TypeError || (err instanceof Error && /fetch|network|ECONNREFUSED|ENOTFOUND|ETIMEDOUT/i.test(err.message))) {
-      console.error("dgent: network error — could not reach the Anthropic API. Check your connection.");
+      console.error("jent: network error — could not reach the Anthropic API. Check your connection.");
     } else {
-      console.error(`dgent: AI skill error (${err instanceof Error ? err.message : String(err)})`);
+      console.error(`jent: AI skill error (${err instanceof Error ? err.message : String(err)})`);
     }
     return null;
   }

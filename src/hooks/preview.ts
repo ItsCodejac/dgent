@@ -74,7 +74,7 @@ export async function showInitPreview(): Promise<void> {
   const totalFixes = dirty.reduce((sum, p) => sum + p.fixes.length, 0);
   const totalFlags = dirty.reduce((sum, p) => sum + p.flags.length, 0);
 
-  console.error(`\n  ${dim("Your last")} ${white(String(commits.length))} ${dim("commits through dgent:")}\n`);
+  console.error(`\n  ${dim("Your last")} ${white(String(commits.length))} ${dim("commits through jent:")}\n`);
 
   for (const preview of previews) {
     const hashStr = dim(preview.hash);

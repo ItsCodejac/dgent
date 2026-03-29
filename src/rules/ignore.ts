@@ -1,13 +1,13 @@
 import type { Flag } from "./index.js";
 
 // Patterns:
-//   // dgent-ignore                      → ignore next line (all rules)
-//   // dgent-ignore-next-line             → ignore next line (all rules)
-//   // dgent-ignore flag-naming           → ignore next line (specific rule)
-//   code(); // dgent-ignore               → ignore this line (all rules)
-//   code(); // dgent-ignore flag-naming   → ignore this line (specific rule)
-//   # dgent-ignore                        → same patterns for Python/shell
-const IGNORE_PATTERN = /(?:\/\/|#)\s*dgent-ignore(?:-next-line)?(?:\s+(.+))?$/;
+//   // jent-ignore                      → ignore next line (all rules)
+//   // jent-ignore-next-line             → ignore next line (all rules)
+//   // jent-ignore flag-naming           → ignore next line (specific rule)
+//   code(); // jent-ignore               → ignore this line (all rules)
+//   code(); // jent-ignore flag-naming   → ignore this line (specific rule)
+//   # jent-ignore                        → same patterns for Python/shell
+const IGNORE_PATTERN = /(?:\/\/|#)\s*jent-ignore(?:-next-line)?(?:\s+(.+))?$/;
 
 export interface IgnoreMap {
   lines: Map<number, Set<string> | "all">;
@@ -27,7 +27,7 @@ export function parseIgnoreComments(input: string): IgnoreMap {
     // Is this a standalone comment line or inline?
     const trimmed = lines[i].trimStart();
     const isStandaloneComment = trimmed.startsWith("//") || trimmed.startsWith("#");
-    const isExplicitNextLine = lines[i].includes("dgent-ignore-next-line");
+    const isExplicitNextLine = lines[i].includes("jent-ignore-next-line");
 
     if (isStandaloneComment || isExplicitNextLine) {
       // Standalone comment or explicit next-line → target the next line

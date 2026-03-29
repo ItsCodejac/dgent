@@ -1,10 +1,10 @@
 ---
-name: dgent-review
-description: Review and address dgent flags from recent commits. Use when asked to review flags, fix tells, or after dgent reports issues.
-trigger: "review flags", "dgent flags", "fix tells", "dgent review"
+name: jent-review
+description: Review and address jent flags from recent commits. Use when asked to review flags, fix tells, or after jent reports issues.
+trigger: "review flags", "jent flags", "fix tells", "jent review"
 ---
 
-# dgent review
+# jent review
 
 Review flags from recent commits and suggest fixes.
 
@@ -12,12 +12,12 @@ Review flags from recent commits and suggest fixes.
 
 1. Get recent flags:
 ```bash
-dgent log --all 2>/dev/null
+jent log --all 2>/dev/null
 ```
 
 Or for the last commit only:
 ```bash
-dgent review 2>/dev/null
+jent review 2>/dev/null
 ```
 
 2. For each flag, read the flagged file and line number.
@@ -28,7 +28,7 @@ dgent review 2>/dev/null
    - **flag-message-tone**: Was the flagged word used naturally or is it AI vocabulary?
    - **flag-log-bracketing**: Are the logs actually narration or are they meaningful telemetry?
 
-4. For valid flags, fix the code. For false positives, consider adding the pattern to `.dgent.json` to suppress:
+4. For valid flags, fix the code. For false positives, consider adding the pattern to `.jent.json` to suppress:
 ```json
 {
   "rules": {

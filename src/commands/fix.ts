@@ -70,7 +70,7 @@ export function registerFix(program: Command): void {
           console.log(JSON.stringify({ file: file ?? null, fixed: false, changes: [], error: "No API key configured." }));
         } else {
           printError("No API key configured.");
-          console.error(`  ${dim("Run")} ${cyan("dgent config set api-key <key>")} ${dim("first.")}`);
+          console.error(`  ${dim("Run")} ${cyan("jent config set api-key <key>")} ${dim("first.")}`);
         }
         process.exit(1);
       }
@@ -80,9 +80,9 @@ export function registerFix(program: Command): void {
       if (file === "-" || !file) {
         if (!file && process.stdin.isTTY) {
           if (options.json) {
-            console.log(JSON.stringify({ file: null, fixed: false, changes: [], error: "Usage: dgent fix <file> or pipe input via stdin" }));
+            console.log(JSON.stringify({ file: null, fixed: false, changes: [], error: "Usage: jent fix <file> or pipe input via stdin" }));
           } else {
-            console.error("Usage: dgent fix <file> or pipe input via stdin");
+            console.error("Usage: jent fix <file> or pipe input via stdin");
           }
           process.exit(1);
         }

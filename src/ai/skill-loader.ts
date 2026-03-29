@@ -3,12 +3,12 @@ import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
-const OVERRIDE_PATH = join(homedir(), ".config", "dgent", "skill.md");
+const OVERRIDE_PATH = join(homedir(), ".config", "jent", "skill.md");
 
 export function loadSkill(): string {
   // Check for user override first
   if (existsSync(OVERRIDE_PATH)) {
-    console.error("dgent: using custom skill override at " + OVERRIDE_PATH);
+    console.error("jent: using custom skill override at " + OVERRIDE_PATH);
     return readFileSync(OVERRIDE_PATH, "utf-8");
   }
 
@@ -27,5 +27,5 @@ export function loadSkill(): string {
   }
 
   // Fallback inline
-  return "You are dgent's AI skill layer. Analyze the input and respond with valid JSON matching the provided schema.";
+  return "You are jent's AI skill layer. Analyze the input and respond with valid JSON matching the provided schema.";
 }

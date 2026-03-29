@@ -4,22 +4,22 @@ import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 
 const IS_MACOS = process.platform === "darwin";
-const LINUX_KEY_PATH = join(homedir(), ".local", "share", "dgent", ".key");
+const LINUX_KEY_PATH = join(homedir(), ".local", "share", "jent", ".key");
 
 export function storeApiKey(key: string): void {
   if (IS_MACOS) {
     try {
       execFileSync("security", [
-        "add-generic-password", "-a", "dgent", "-s", "dgent-api-key", "-w", key, "-U",
+        "add-generic-password", "-a", "jent", "-s", "jent-api-key", "-w", key, "-U",
       ], { stdio: "pipe" });
     } catch {
       try {
         execFileSync("security", [
-          "delete-generic-password", "-a", "dgent", "-s", "dgent-api-key",
+          "delete-generic-password", "-a", "jent", "-s", "jent-api-key",
         ], { stdio: "pipe" });
       } catch { /* may not exist */ }
       execFileSync("security", [
-        "add-generic-password", "-a", "dgent", "-s", "dgent-api-key", "-w", key,
+        "add-generic-password", "-a", "jent", "-s", "jent-api-key", "-w", key,
       ], { stdio: "pipe" });
     }
   } else {
@@ -35,7 +35,7 @@ export function loadStoredApiKey(): string | null {
   if (IS_MACOS) {
     try {
       return execFileSync("security", [
-        "find-generic-password", "-a", "dgent", "-s", "dgent-api-key", "-w",
+        "find-generic-password", "-a", "jent", "-s", "jent-api-key", "-w",
       ], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
     } catch {
       return null;
@@ -53,7 +53,7 @@ export function deleteApiKey(): void {
   if (IS_MACOS) {
     try {
       execFileSync("security", [
-        "delete-generic-password", "-a", "dgent", "-s", "dgent-api-key",
+        "delete-generic-password", "-a", "jent", "-s", "jent-api-key",
       ], { stdio: "pipe" });
     } catch { /* may not exist */ }
   } else {

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Box, Text, useApp, useInput } from "ink";
 import { ConfirmInput } from "@inkjs/ui";
-import type { DgentConfig } from "../config/index.js";
+import type { JentConfig } from "../config/index.js";
 import { RULE_DESCRIPTIONS } from "./rule-descriptions.js";
 
 interface ConfigAppProps {
-  config: DgentConfig;
-  onSave: (config: DgentConfig) => void;
+  config: JentConfig;
+  onSave: (config: JentConfig) => void;
 }
 
 interface RuleEntry {
@@ -123,7 +123,7 @@ export function ConfigApp({ config, onSave }: ConfigAppProps) {
       <Box marginTop={1} paddingLeft={2} flexDirection="column">
         <Text dimColor>  ai.enabled = {String(config.ai.enabled)}</Text>
         <Text dimColor>  ai.model = {config.ai.model}</Text>
-        <Text dimColor>  {"  "}(use dgent config set ai.enabled true to change)</Text>
+        <Text dimColor>  {"  "}(use jent config set ai.enabled true to change)</Text>
       </Box>
 
       {/* Controls */}

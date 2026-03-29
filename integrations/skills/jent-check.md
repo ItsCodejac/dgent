@@ -1,12 +1,12 @@
 ---
-name: dgent-check
-description: Run dgent to check files for AI tells before committing. Use when finishing work, before creating commits, or when asked to clean up agent output.
-trigger: before committing, "check for tells", "clean up", "run dgent", "strip tells"
+name: jent-check
+description: Run jent to check files for AI tells before committing. Use when finishing work, before creating commits, or when asked to clean up agent output.
+trigger: before committing, "check for tells", "clean up", "run jent", "strip tells"
 ---
 
-# dgent check
+# jent check
 
-Run dgent on modified files to identify AI tells before committing.
+Run jent on modified files to identify AI tells before committing.
 
 ## Process
 
@@ -16,9 +16,9 @@ git diff --name-only --diff-filter=ACM
 git diff --cached --name-only --diff-filter=ACM
 ```
 
-2. Run dgent on each file with JSON output:
+2. Run jent on each file with JSON output:
 ```bash
-dgent run --json <file>
+jent run --json <file>
 ```
 
 3. Parse the JSON result:
@@ -33,13 +33,13 @@ dgent run --json <file>
 
 5. For commit messages, check the message:
 ```bash
-echo "your commit message" | dgent run --json --commit-msg -
+echo "your commit message" | jent run --json --commit-msg -
 ```
 
 ## Example
 
 ```bash
-$ dgent run --json src/services/UserManager.ts
+$ jent run --json src/services/UserManager.ts
 {
   "file": "src/services/UserManager.ts",
   "phase": "pre-commit",

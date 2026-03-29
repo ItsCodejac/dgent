@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://dgent.dev/schemas/scan-output.json",
-  "title": "dgent scan --json output",
-  "description": "JSON output produced by `dgent scan --json [dir]`. Exit codes: 0 = clean or fixes applied, 1 = flags found.",
+  "$id": "https://jent.dev/schemas/scan-output.json",
+  "title": "jent scan --json output",
+  "description": "JSON output produced by `jent scan --json [dir]`. Exit codes: 0 = clean or fixes applied, 1 = flags found.",
   "type": "object",
   "required": ["files", "clean", "filesWithIssues", "totalFixes", "totalFlags", "results"],
   "additionalProperties": false,

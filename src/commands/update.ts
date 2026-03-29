@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { VERSION, printCompact } from "../ui/brand.js";
 import { dim, green, yellow, cyan } from "../ui/colors.js";
 
-// dgent-ignore flag-naming
+// jent-ignore flag-naming
 function detectPackageManager(): { name: string; cmd: string } {
   // Check npm_config_user_agent first (set by npm/pnpm/yarn/bun when running scripts)
   const userAgent = process.env.npm_config_user_agent ?? "";
@@ -35,19 +35,19 @@ export function registerUpdate(program: Command): void {
       let latest: string;
       try {
         if (pm.name === "yarn") {
-          latest = execFileSync("npm", ["view", "dgent", "version"], {
+          latest = execFileSync("npm", ["view", "jent", "version"], {
             encoding: "utf-8",
             stdio: ["pipe", "pipe", "pipe"],
           }).trim();
         } else {
-          latest = execFileSync(pm.cmd, ["view", "dgent", "version"], {
+          latest = execFileSync(pm.cmd, ["view", "jent", "version"], {
             encoding: "utf-8",
             stdio: ["pipe", "pipe", "pipe"],
           }).trim();
         }
       } catch {
         console.error(`  ${yellow("!")} Could not check registry.`);
-        console.error(`  ${dim("Run")} ${cyan(`${pm.cmd} update -g dgent`)} ${dim("manually.")}`);
+        console.error(`  ${dim("Run")} ${cyan(`${pm.cmd} update -g jent`)} ${dim("manually.")}`);
         return;
       }
 
@@ -60,16 +60,16 @@ export function registerUpdate(program: Command): void {
 
       try {
         if (pm.name === "yarn") {
-          execFileSync("yarn", ["global", "add", "dgent"], { stdio: "inherit" });
+          execFileSync("yarn", ["global", "add", "jent"], { stdio: "inherit" });
         } else if (pm.name === "bun") {
-          execFileSync("bun", ["install", "-g", "dgent"], { stdio: "inherit" });
+          execFileSync("bun", ["install", "-g", "jent"], { stdio: "inherit" });
         } else {
-          execFileSync(pm.cmd, ["update", "-g", "dgent"], { stdio: "inherit" });
+          execFileSync(pm.cmd, ["update", "-g", "jent"], { stdio: "inherit" });
         }
         console.error(`  ${green("✓")} Updated to v${latest}`);
       } catch {
         console.error(`  ${yellow("!")} Update failed.`);
-        console.error(`  ${dim("Run")} ${cyan(`${pm.cmd} update -g dgent`)} ${dim("manually.")}`);
+        console.error(`  ${dim("Run")} ${cyan(`${pm.cmd} update -g jent`)} ${dim("manually.")}`);
       }
     });
 }

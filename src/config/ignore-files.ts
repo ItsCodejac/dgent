@@ -27,7 +27,7 @@ function loadPatterns(): string[] {
     return cachedPatterns;
   }
 
-  const ignorePath = join(root, ".dgentignore");
+  const ignorePath = join(root, ".jentignore");
   try {
     const content = readFileSync(ignorePath, "utf-8");
     cachedPatterns = content
@@ -116,7 +116,7 @@ function globToRegex(pattern: string): RegExp {
 }
 
 /**
- * Check if a file should be ignored based on .dgentignore patterns.
+ * Check if a file should be ignored based on .jentignore patterns.
  * @param filePath - Path to check (absolute or relative)
  * @returns true if the file should be ignored
  */

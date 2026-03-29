@@ -31,7 +31,7 @@ interface Check {
 export function registerDoctor(program: Command): void {
   program
     .command("doctor")
-    .description("Check dgent setup and common issues")
+    .description("Check jent setup and common issues")
     .action(() => {
       printCompact(`${dim("checking setup...")}\n`);
 
@@ -39,8 +39,8 @@ export function registerDoctor(program: Command): void {
 
       // 1. Hooks installed?
       const hooksPath = safeGit("config", "--global", "core.hooksPath");
-      const hooksDir = join(homedir(), ".config", "dgent", "hooks");
-      const hasMarker = existsSync(join(hooksDir, ".dgent"));
+      const hooksDir = join(homedir(), ".config", "jent", "hooks");
+      const hasMarker = existsSync(join(hooksDir, ".jent"));
 
       if (hooksPath && hasMarker) {
         checks.push({ name: "Hooks", status: "pass", message: "installed and active" });
@@ -48,20 +48,20 @@ export function registerDoctor(program: Command): void {
         checks.push({
           name: "Hooks",
           status: "warn",
-          message: `core.hooksPath set to ${hooksPath} (not dgent)`,
-          fix: "Run dgent init or chain manually",
+          message: `core.hooksPath set to ${hooksPath} (not jent)`,
+          fix: "Run jent init or chain manually",
         });
       } else {
         checks.push({
           name: "Hooks",
           status: "fail",
           message: "not installed",
-          fix: "dgent init",
+          fix: "jent init",
         });
       }
 
       // 2. Consent given?
-      const hasConsent = existsSync(join(homedir(), ".config", "dgent", "consent"));
+      const hasConsent = existsSync(join(homedir(), ".config", "jent", "consent"));
       if (hasConsent) {
         checks.push({ name: "Consent", status: "pass", message: "file transforms authorized" });
       } else {
@@ -136,7 +136,7 @@ export function registerDoctor(program: Command): void {
             name: "AI layer",
             status: "fail",
             message: "enabled but no API key",
-            fix: "dgent config set api-key <key>",
+            fix: "jent config set api-key <key>",
           });
         }
       } else {
@@ -146,17 +146,17 @@ export function registerDoctor(program: Command): void {
       // 6. Repo overrides?
       const repoRoot = safeGit("rev-parse", "--show-toplevel");
       if (repoRoot) {
-        const overridePath = join(repoRoot, ".dgent.json");
+        const overridePath = join(repoRoot, ".jent.json");
         if (existsSync(overridePath)) {
           try {
             JSON.parse(readFileSync(overridePath, "utf-8"));
-            checks.push({ name: "Repo overrides", status: "pass", message: ".dgent.json found" });
+            checks.push({ name: "Repo overrides", status: "pass", message: ".jent.json found" });
           } catch {
             checks.push({
               name: "Repo overrides",
               status: "fail",
-              message: ".dgent.json has invalid JSON",
-              fix: "Fix or delete .dgent.json",
+              message: ".jent.json has invalid JSON",
+              fix: "Fix or delete .jent.json",
             });
           }
         }

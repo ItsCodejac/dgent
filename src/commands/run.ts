@@ -168,7 +168,7 @@ export function registerRun(program: Command): void {
         process.stdout.write(output);
       } else if (output !== input && !options.dryRun && !options.fix) {
         // File mode without --fix: show as dry-run preview
-        console.error(`  ${dim("use")} ${cyan("--fix")} ${dim("to apply, or pipe:")} ${cyan(`dgent run ${file} --fix`)}`);
+        console.error(`  ${dim("use")} ${cyan("--fix")} ${dim("to apply, or pipe:")} ${cyan(`jent run ${file} --fix`)}`);
       } else if (options.dryRun && output !== input) {
         console.error(`  ${dim("dry-run — changes not applied")}`);
       }

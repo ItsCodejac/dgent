@@ -4,10 +4,10 @@ import { ReviewApp } from "./review-app.js";
 import { ConfigApp } from "./config-app.js";
 import { DashboardApp } from "./dashboard-app.js";
 import type { LogEntry } from "../hooks/log-writer.js";
-import type { DgentConfig } from "../config/index.js";
+import type { JentConfig } from "../config/index.js";
 
 export async function renderDashboard(
-  config: DgentConfig,
+  config: JentConfig,
   logs: LogEntry[],
   version: string,
   onAction: (action: string) => void,
@@ -29,8 +29,8 @@ export async function renderReview(
 }
 
 export async function renderConfig(
-  config: DgentConfig,
-  onSave: (config: DgentConfig) => void,
+  config: JentConfig,
+  onSave: (config: JentConfig) => void,
 ): Promise<void> {
   const { waitUntilExit } = render(
     <ConfigApp config={config} onSave={onSave} />,

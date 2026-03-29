@@ -46,7 +46,7 @@ export function registerReview(program: Command): void {
         console.error("");
       }
 
-      console.error(`  ${dim("Use")} ${cyan("dgent log")} ${dim("for full history")}`);
-      console.error(`  ${dim("Use")} ${cyan("dgent config set rules.<name> false")} ${dim("to disable a rule")}`);
+      console.error(`  ${dim("Use")} ${cyan("jent log")} ${dim("for full history")}`);
+      console.error(`  ${dim("Use")} ${cyan("jent config set rules.<name> false")} ${dim("to disable a rule")}`);
     });
 }

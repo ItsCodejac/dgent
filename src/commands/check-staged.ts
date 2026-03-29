@@ -39,7 +39,7 @@ export function registerCheckStaged(program: Command): void {
         return;
       }
 
-      // Filter to code files, skip binary, respect .dgentignore
+      // Filter to code files, skip binary, respect .jentignore
       stagedFiles = stagedFiles.filter((f) => {
         const ext = extname(f).toLowerCase();
         if (BINARY_EXTENSIONS.has(ext)) return false;
@@ -146,7 +146,7 @@ export function registerCheckStaged(program: Command): void {
         console.error(`  ${bold(white(String(stagedFiles.length)))} ${dim("staged files checked,")} ${green(String(cleanFiles))} ${dim("clean,")} ${summary.join(dim(", "))}`);
 
         if (totalFlags > 0) {
-          console.error(`  ${dim("Run")} ${cyan("dgent fix <file>")} ${dim("to resolve flags with AI")}`);
+          console.error(`  ${dim("Run")} ${cyan("jent fix <file>")} ${dim("to resolve flags with AI")}`);
         }
       }
 

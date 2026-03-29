@@ -1,10 +1,10 @@
-# dgent integration
+# jent integration
 
-dgent (de-agent) cleans AI tells from commits and code via git hooks.
+jent (de-agent) cleans AI tells from commits and code via git hooks.
 
 ## Automatic behavior
 
-dgent runs on every `git commit` via global hooks. It handles:
+jent runs on every `git commit` via global hooks. It handles:
 - Removing Co-Authored-By and Generated-By trailers from commit messages
 - Stripping emoji from commit messages and code comments
 - Normalizing conventional commit format
@@ -14,26 +14,26 @@ dgent runs on every `git commit` via global hooks. It handles:
 
 ```bash
 # Check a single file silently (exit 0 = clean, 1 = flags)
-dgent run --check <file>
+jent run --check <file>
 
 # Check a file with JSON output (fixes[], flags[], clean boolean)
-dgent run --json <file>
+jent run --json <file>
 
 # Scan an entire directory
-dgent scan --json [dir]
+jent scan --json [dir]
 
 # Check only staged files before committing
-dgent check-staged --json
+jent check-staged --json
 
 # List all rules and their status
-dgent rules --json
+jent rules --json
 ```
 
-## When to run dgent
+## When to run jent
 
-Run dgent **after writing code, before committing**:
+Run jent **after writing code, before committing**:
 1. Write or modify files
-2. Run `dgent check-staged --json` to check staged files, or `dgent run --check <file>` on individual files
+2. Run `jent check-staged --json` to check staged files, or `jent run --check <file>` on individual files
 3. Fix any flagged issues
 4. Commit
 
@@ -48,6 +48,6 @@ These patterns get flagged:
 
 ## Configuration
 
-- Check current rules: `dgent config list`
-- Repo overrides: `.dgent.json`
-- Exclude paths from scanning: `.dgentignore` (same syntax as `.gitignore`)
+- Check current rules: `jent config list`
+- Repo overrides: `.jent.json`
+- Exclude paths from scanning: `.jentignore` (same syntax as `.gitignore`)
