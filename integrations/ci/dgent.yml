@@ -1,0 +1,109 @@
+# dgent — de-agent your code
+# Add this to .github/workflows/dgent.yml
+#
+# Scans PR diffs for AI tells and posts results as a comment.
+# Exit code 1 = flags found (optional: set to required check to block merge)
+
+name: dgent
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  scan:
+    name: De-agent check
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dgent
+        run: npm install -g dgent
+
+      - name: Get changed files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only --diff-filter=ACM origin/${{ github.base_ref }}...HEAD | grep -E '\.(ts|tsx|js|jsx|py|go|rs|java|rb|swift)$' || true)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Scan for tells
+        id: scan
+        if: steps.changed.outputs.files != ''
+        run: |
+          RESULTS=""
+          EXIT=0
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            OUTPUT=$(dgent run --json "$file" 2>/dev/null || true)
+            CLEAN=$(echo "$OUTPUT" | jq -r '.clean')
+            if [ "$CLEAN" = "false" ]; then
+              RESULTS="$RESULTS\n### $file\n"
+              FIXES=$(echo "$OUTPUT" | jq -r '.fixes[]?.rule' 2>/dev/null)
+              FLAGS=$(echo "$OUTPUT" | jq -r '.flags[] | "- **\(.rule)** line \(.line): \(.message)"' 2>/dev/null)
+              [ -n "$FIXES" ] && RESULTS="$RESULTS\nAuto-fixable: $FIXES\n"
+              [ -n "$FLAGS" ] && RESULTS="$RESULTS\n$FLAGS\n"
+              EXIT=1
+            fi
+          done <<< "${{ steps.changed.outputs.files }}"
+
+          echo "exit_code=$EXIT" >> $GITHUB_OUTPUT
+          echo "results<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$RESULTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post results
+        if: steps.scan.outputs.exit_code == '1'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `## dgent · de-agent your code
+
+            AI tells detected in this PR:
+
+            ${{ steps.scan.outputs.results }}
+
+            ---
+            *Run \`dgent fix <file>\` to resolve flags with AI, or \`dgent scan --fix\` to auto-fix.*`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes('dgent · de-agent'));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Clean PR
+        if: steps.scan.outputs.exit_code == '0' || steps.changed.outputs.files == ''
+        run: echo "No AI tells detected"
+
+      # Uncomment to make dgent a required check:
+      # - name: Fail on flags
+      #   if: steps.scan.outputs.exit_code == '1'
+      #   run: exit 1

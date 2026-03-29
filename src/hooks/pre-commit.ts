@@ -8,6 +8,7 @@ import type { Flag } from "../rules/index.js";
 import { callSkill } from "../ai/client.js";
 import { loadSkill } from "../ai/skill-loader.js";
 import { hasConsented, promptConsent } from "./consent.js";
+import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { dim, green } from "../ui/colors.js";
 import { LOGO_COMPACT } from "../ui/brand.js";
 
@@ -111,6 +112,7 @@ export async function handlePreCommit(): Promise<void> {
       let modified = content;
       const fileFlags: Flag[] = [];
       const rulesApplied: string[] = [];
+      const ignoreMap = parseIgnoreComments(content);
 
       for (const rule of enabledRules) {
         const result = await rule.apply(modified);
@@ -119,7 +121,8 @@ export async function handlePreCommit(): Promise<void> {
           rulesApplied.push(rule.name);
         }
         if (result.flags.length > 0) {
-          fileFlags.push(...result.flags);
+          const filtered = filterIgnoredFlags(result.flags, ignoreMap);
+          fileFlags.push(...filtered);
         }
       }
 

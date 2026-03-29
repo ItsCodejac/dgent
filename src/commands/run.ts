@@ -4,6 +4,7 @@ import { extname } from "node:path";
 import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
 import type { Rule, Flag } from "../rules/index.js";
+import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { printCompact, printRuleResult, printFlag, printSuccess } from "../ui/brand.js";
 import { dim, green } from "../ui/colors.js";
 
@@ -80,6 +81,7 @@ export function registerRun(program: Command): void {
       }
 
       const config = loadConfig();
+      const ignoreMap = parseIgnoreComments(input);
       let output = input;
       const fixResults: Array<{ rule: string }> = [];
       const flagResults: Flag[] = [];
@@ -106,7 +108,8 @@ export function registerRun(program: Command): void {
           if (!options.json) printRuleResult(rule.name, "flagged");
         }
 
-        for (const flag of result.flags) {
+        const filtered = filterIgnoredFlags(result.flags, ignoreMap);
+        for (const flag of filtered) {
           flagResults.push(flag);
           if (!options.json) printFlag({ ...flag, file });
         }
