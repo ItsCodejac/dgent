@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { loadConfig, saveConfig, setConfigValue, formatConfigList } from "../config/index.js";
+import { loadConfig, saveConfig, setConfigValue, getConfigValue, formatConfigList } from "../config/index.js";
 import { storeApiKey, deleteApiKey } from "../config/secrets.js";
 
 export function registerConfig(program: Command): void {
@@ -40,6 +40,13 @@ export function registerConfig(program: Command): void {
       }
 
       const current = loadConfig();
+
+      // Validate key exists in schema
+      const existing = getConfigValue(current, key);
+      if (existing === undefined && !key.startsWith("rules.")) {
+        console.warn(`Warning: unknown config key "${key}"`);
+      }
+
       const updated = setConfigValue(current, key, value);
       saveConfig(updated);
       const display = value === "true" ? true : value === "false" ? false : value;

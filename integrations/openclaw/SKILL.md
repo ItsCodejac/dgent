@@ -1,7 +1,7 @@
 ---
 name: dgent
 description: De-agent your code. Run dgent to check files and commit messages for AI tells before committing — flags naming patterns, catch-rethrow, AI vocabulary, emoji, trailers. Use when finishing work, before commits, or when asked to clean up agent output.
-version: 1.0.0
+version: 0.1.0
 homepage: https://github.com/cojac/dgent
 metadata: { "openclaw": { "requires": { "bins": ["dgent"] }, "install": [{ "kind": "node", "package": "dgent", "bins": ["dgent"], "label": "Install dgent (npm)" }], "emoji": "broom", "homepage": "https://github.com/cojac/dgent", "os": ["darwin", "linux"] } }
 ---

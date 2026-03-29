@@ -47,13 +47,10 @@ export function registerRules(program: Command): void {
     .command("rules")
     .description("List all rules with patterns and status")
     .option("--json", "Output as JSON (for agent consumption)")
-    .action((options: { json?: boolean }) => {
-      const config = (async () => {
-        const { loadConfig } = await import("../config/index.js");
-        return loadConfig();
-      })();
-
-      void config.then((cfg) => {
+    .action(async (options: { json?: boolean }) => {
+      const { loadConfig } = await import("../config/index.js");
+      const cfg = loadConfig();
+      {
         if (options.json) {
           const catalog = rules.map((r) => ({
             name: r.name,
@@ -89,6 +86,6 @@ export function registerRules(program: Command): void {
           }
         }
         console.log("");
-      });
+      }
     });
 }

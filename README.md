@@ -1,8 +1,12 @@
-```
-  dgent · de-agent your code
-```
+# dgent
+
+**De-agent your code.**
+
+[![npm](https://img.shields.io/npm/v/dgent)](https://www.npmjs.com/package/dgent) [![license](https://img.shields.io/npm/l/dgent)](LICENSE) [![node](https://img.shields.io/node/v/dgent)](package.json)
 
 Your code just needs to be de-agented. dgent runs automatically via git hooks — cleaning commit messages and code before they land in your repo. No workflow changes required.
+
+> **Platforms:** macOS, Linux. Windows is not supported.
 
 ## The problem
 
@@ -13,7 +17,7 @@ AI agents speed up your workflow, but their output has tells:
 - Comments that restate the next line of code
 - `DataProcessor`, `UserServiceHandler` naming
 - Catch blocks that only log and re-throw
-- Section header comments in 30-line files
+- Section header comments in small files
 - Words like "enhance", "streamline", "comprehensive"
 
 ### Before dgent
@@ -29,17 +33,26 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### After dgent
 
-```
-Implement caching to enhance performance     ← emoji stripped
-                                              ← trailer removed
-This commit adds Redis caching for API        ← "enhance" flagged
-responses to streamline the data fetching     ← "this commit" flagged
-process.                                      ← "streamline" flagged
+```diff
+- ✨ Implement caching to enhance performance
++ Implement caching to enhance performance
+
+  This commit adds Redis caching for API responses
+  to streamline the data fetching process.
+
+- Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-Fixes are automatic. Flags print as warnings so you can decide.
+```
+dgent  2 fixes applied, 3 flags
+  ✓ strip-emojis
+  ✓ strip-trailers
+  ! line 1: AI vocabulary: "enhance"
+  ! line 3: AI phrase: "this commit"
+  ! line 4: AI vocabulary: "streamline"
+```
 
-Fixing these manually costs time proportional to the time the agent saved.
+**Fixes** (emoji, trailers, formatting) are automatic. **Flags** (vocabulary, naming) print as warnings — you decide what to change.
 
 ## Install
 
@@ -81,26 +94,29 @@ dgent installs two git hooks (`commit-msg` and `pre-commit`) that clean agent ou
 ## Commands
 
 ```sh
-dgent init              # Install global git hooks
-dgent uninstall         # Remove hooks
-dgent scan [dir]        # Scan entire directory for tells
-dgent scan --fix        # Scan and auto-fix
-dgent run <file>        # Check a single file
-dgent run --fix <file>  # Fix a file in place
-dgent run --json <file> # Structured output for agents/CI
-dgent fix <file>        # AI-powered fix for flags (requires API key)
-dgent fix --commit-msg  # AI-powered commit message cleanup
-dgent config list       # Show current config
-dgent config set <k> <v>  # Change a setting
-dgent config            # Interactive config editor (TUI)
-dgent review            # Interactive flag review (TUI)
-dgent stats             # Flag trends and breakdown
-dgent log               # Raw flag history
-dgent doctor            # Check setup and common issues
-dgent integrate         # Install Claude Code skills
-dgent rage              # Print debug info for bug reports
-dgent test              # Run fixture suite
-dgent update            # Self-update via npm
+dgent init                  # Install global hooks (prompts for confirmation)
+dgent init -y               # Install without confirmation
+dgent uninstall             # Remove hooks, restore hooksPath
+dgent scan [dir]            # Scan directory for tells
+dgent scan --fix [dir]      # Scan and auto-fix
+dgent scan --json [dir]     # Structured output for CI
+dgent run <file>            # Check a single file
+dgent run --fix <file>      # Fix a file in place
+dgent run --check <file>    # Silent — exit 0 clean, 1 flags
+dgent run --json <file>     # Structured output for agents
+dgent fix <file>            # AI-powered fix (requires API key)
+dgent rules                 # List all rules with patterns
+dgent rules --json          # Machine-readable rule catalog
+dgent config                # Interactive config editor (TUI)
+dgent config list           # Print all config values
+dgent config set <k> <v>    # Set a config value
+dgent review                # Review flags from last commit (TUI)
+dgent stats                 # Flag trends and breakdown
+dgent log                   # Flag history
+dgent doctor                # Check setup and diagnose issues
+dgent integrate             # Install agent skills (Claude Code, OpenClaw)
+dgent rage                  # Debug info for bug reports
+dgent update                # Self-update via npm
 ```
 
 Try it without installing: `npx dgent run --json <file>`

@@ -82,6 +82,12 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
     const hasChanges = fixRules.length > 0 || allFlags.length > 0;
     if (!hasChanges) return;
 
+    // Summary line
+    const parts: string[] = [];
+    if (fixRules.length > 0) parts.push(`${green(String(fixRules.length))} ${dim("fixed")}`);
+    if (allFlags.length > 0) parts.push(`${yellow(String(allFlags.length))} ${dim("flagged")}`);
+    console.error(`  ${LOGO_COMPACT} ${parts.join(dim(", "))}`);
+
     if (dryRun) {
       printDryRunHeader();
       for (const name of fixRules) printRuleResult(name, "fixed");
