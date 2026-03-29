@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Every agent commit that lands should look like it was written by a developer who knows the codebase, not by a tool following a template.
-**Current focus:** Phase 5 — AI Skill Layer
+**Current focus:** Phase 6 — TUI + Polish
 
 ## Current Position
 
-Phase: 5 of 6 (AI Skill Layer)
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-03-28 — 05-01 complete (API key storage + SDK client)
+Phase: 6 of 6 (TUI + Polish)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-28 — Phase 5 complete
 
-Progress: ███████░░░ 10/14 plans (71%)
+Progress: █████████░ 12/14 plans (86%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 12
 - Average duration: —
 - Total execution time: —
 
@@ -31,7 +31,7 @@ Progress: ███████░░░ 10/14 plans (71%)
 | 2. Message Rules | 2/2 | — | — |
 | 3. Hook Lifecycle | 1/1 | — | — |
 | 4. Diff Transforms | 3/3 | — | — |
-| 5. AI Skill Layer | 1/3 | — | — |
+| 5. AI Skill Layer | 3/3 | — | — |
 
 ## Accumulated Context
 
@@ -39,9 +39,10 @@ Progress: ███████░░░ 10/14 plans (71%)
 
 - npm global install over Bun compile + Homebrew
 - ESM with Node16 module resolution
-- macOS keychain via security CLI for API key, Linux plain file with 600 perms
-- ANTHROPIC_API_KEY env var takes precedence over stored key
-- jsonSchemaOutputFormat with any cast for flexible schema types
+- macOS keychain via security CLI, Linux plain file with 600 perms
+- ANTHROPIC_API_KEY env var takes precedence
+- Rule interface supports async apply for AI-dependent rules
+- strip-noise-comments uses 70% word overlap threshold
 
 ### Deferred Issues
 
@@ -49,10 +50,10 @@ None.
 
 ### Blockers/Concerns
 
-None.
+- Ink compatibility with npm global install needs spike before TUI work
 
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: 05-01 complete. API key storage + Anthropic SDK client ready. 36/36 fixtures pass.
+Stopped at: Phase 5 complete. 12 rules implemented, 44/44 fixtures passing. AI skill layer functional.
 Resume file: None
