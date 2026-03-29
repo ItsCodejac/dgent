@@ -1,0 +1,5 @@
+feat: add notifications
+
+Email notifications
+Push notifications
+SMS notifications (pending)

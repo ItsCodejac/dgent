@@ -19,4 +19,7 @@ export interface Flag {
   suggestion?: string;
 }
 
-export const rules: Rule[] = [];
+import { stripTrailers } from "./strip-trailers.js";
+import { stripEmojis } from "./strip-emojis.js";
+
+export const rules: Rule[] = [stripTrailers, stripEmojis];

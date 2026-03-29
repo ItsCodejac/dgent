@@ -1,0 +1,6 @@
+refactor: simplify error handling
+
+Removed redundant try-catch blocks in the API layer.
+Consolidated error formatting into a single middleware.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>

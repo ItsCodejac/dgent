@@ -1,0 +1,5 @@
+feat: add user authentication
+
+Implements JWT-based auth with bcrypt password hashing.
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -1,0 +1,4 @@
+refactor: simplify error handling
+
+Removed redundant try-catch blocks in the API layer.
+Consolidated error formatting into a single middleware.

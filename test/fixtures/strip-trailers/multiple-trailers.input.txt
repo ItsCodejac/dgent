@@ -1,0 +1,4 @@
+fix: resolve login bug
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+Generated-By: Claude Code
