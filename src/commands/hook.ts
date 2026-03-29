@@ -1,15 +1,31 @@
 import type { Command } from "commander";
+import { handleCommitMsg } from "../hooks/commit-msg.js";
 
 export function registerHook(program: Command): void {
   const hook = program
-    .command("hook <type>")
+    .command("hook")
     .description("Internal: called by git hook scripts")
+    .argument("<type>", "hook type (commit-msg or pre-commit)")
+    .argument("[args...]", "additional arguments passed by git")
     .allowUnknownOption()
-    .action((type: string) => {
-      console.log(`hook ${type}: not implemented yet`);
+    .action((type: string, args: string[]) => {
+      switch (type) {
+        case "commit-msg": {
+          const msgFile = args[0];
+          if (!msgFile) {
+            console.error("dgent hook commit-msg: no message file provided");
+            process.exit(0);
+          }
+          handleCommitMsg(msgFile);
+          break;
+        }
+        case "pre-commit":
+          // Stub — implemented in Phase 4
+          break;
+        default:
+          console.error(`dgent hook: unknown hook type "${type}"`);
+      }
     });
 
-  // Hide from --help output
-  hook.helpInformation = () => "";
   (hook as unknown as Record<string, boolean>)._hidden = true;
 }
