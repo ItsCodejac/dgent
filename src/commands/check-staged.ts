@@ -128,7 +128,7 @@ export function registerCheckStaged(program: Command): void {
           results: results.map((r) => ({
             file: r.file,
             fixes: r.fixes,
-            flags: r.flags.map((f) => ({ rule: f.rule, line: f.line, message: f.message })),
+            flags: r.flags.map((f) => ({ rule: f.rule, line: f.line, message: f.message, suggestion: f.suggestion })),
           })),
         }, null, 2));
         process.exit(totalFlags > 0 ? 1 : 0);
