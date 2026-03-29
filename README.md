@@ -4,7 +4,7 @@
 
 **De-agent your code.**
 
-[![npm](https://img.shields.io/npm/v/dgent)](https://www.npmjs.com/package/dgent) [![license](https://img.shields.io/npm/l/dgent)](LICENSE) [![node](https://img.shields.io/node/v/dgent)](package.json)
+[![npm](https://img.shields.io/npm/v/@itscojac/dgent)](https://www.npmjs.com/package/@itscojac/dgent) [![license](https://img.shields.io/npm/l/@itscojac/dgent)](LICENSE) [![node](https://img.shields.io/node/v/@itscojac/dgent)](package.json)
 
 Your code just needs to be de-agented. dgent runs automatically via git hooks — cleaning commit messages and code before they land in your repo. No workflow changes required.
 
@@ -61,7 +61,7 @@ dgent  2 fixes applied, 3 flags
 ## Install
 
 ```sh
-npm install -g dgent
+npm install -g @itscojac/dgent
 dgent init
 ```
 
@@ -123,7 +123,7 @@ dgent rage                  # Debug info for bug reports
 dgent update                # Self-update via npm
 ```
 
-Try it without installing: `npx dgent run --json <file>`
+Try it without installing: `npx @itscojac/dgent run --json <file>`
 
 ## Configuration
 
