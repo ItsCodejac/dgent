@@ -1,5 +1,7 @@
 # dgent
 
+> **dgent** (dee-agent) — de-agent your code
+
 **De-agent your code.**
 
 [![npm](https://img.shields.io/npm/v/dgent)](https://www.npmjs.com/package/dgent) [![license](https://img.shields.io/npm/l/dgent)](LICENSE) [![node](https://img.shields.io/node/v/dgent)](package.json)

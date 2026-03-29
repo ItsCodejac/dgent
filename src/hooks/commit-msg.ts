@@ -56,6 +56,7 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
     }
 
     const config = loadConfig();
+    if (config.disabled) return;
     let message = readFileSync(msgFilePath, "utf-8");
     const original = message;
     const allFlags: Flag[] = [];
@@ -86,7 +87,7 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
     const parts: string[] = [];
     if (fixRules.length > 0) parts.push(`${green(String(fixRules.length))} ${dim("fixed")}`);
     if (allFlags.length > 0) parts.push(`${yellow(String(allFlags.length))} ${dim("flagged")}`);
-    console.error(`  ${LOGO_COMPACT} ${parts.join(dim(", "))}`);
+    console.error(`  ${LOGO_COMPACT()} ${parts.join(dim(", "))}`);
 
     if (dryRun) {
       printDryRunHeader();
@@ -100,7 +101,7 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
     if (message !== original) {
       writeFileSync(msgFilePath, message, "utf-8");
       if (config.output.verbose) {
-        console.error(`  ${LOGO_COMPACT} ${dim("cleaned:")} ${fixRules.join(", ")}`);
+        console.error(`  ${LOGO_COMPACT()} ${dim("cleaned:")} ${fixRules.join(", ")}`);
       }
     }
 
@@ -129,7 +130,7 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
 
         if (result && result.fixed_message !== currentMessage) {
           writeFileSync(msgFilePath, result.fixed_message, "utf-8");
-          console.error(`  ${LOGO_COMPACT} ${green("autofix")} ${dim("resolved")} ${result.changes.length} ${dim("flag(s)")}`);
+          console.error(`  ${LOGO_COMPACT()} ${green("autofix")} ${dim("resolved")} ${result.changes.length} ${dim("flag(s)")}`);
           for (const change of result.changes) {
             console.error(`    ${dim("→")} ${dim(change.description)}`);
           }
@@ -142,11 +143,11 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
 
     // Print flags (if not auto-fixed)
     if (allFlags.length > 0) {
-      console.error(`  ${LOGO_COMPACT} ${yellow(`${allFlags.length} flag${allFlags.length > 1 ? "s" : ""}`)}`);
+      console.error(`  ${LOGO_COMPACT()} ${yellow(`${allFlags.length} flag${allFlags.length > 1 ? "s" : ""}`)}`);
       for (const flag of allFlags) printFlag(flag);
       writeLog(allFlags);
     }
   } catch (err) {
-    console.error(`  ${LOGO_COMPACT} ${dim(`error: ${err instanceof Error ? err.message : String(err)}`)}`);
+    console.error(`  ${LOGO_COMPACT()} ${dim(`error: ${err instanceof Error ? err.message : String(err)}`)}`);
   }
 }

@@ -1,8 +1,9 @@
-const enabled = !process.env.NO_COLOR && process.stderr.isTTY !== false;
+function isEnabled(): boolean {
+  return !process.env.NO_COLOR && process.stderr.isTTY !== false;
+}
 
 const code = (open: number, close: number) => {
-  if (!enabled) return (s: string) => s;
-  return (s: string) => `\x1b[${open}m${s}\x1b[${close}m`;
+  return (s: string) => isEnabled() ? `\x1b[${open}m${s}\x1b[${close}m` : s;
 };
 
 export const bold = code(1, 22);

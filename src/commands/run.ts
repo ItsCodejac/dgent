@@ -27,15 +27,13 @@ export function registerRun(program: Command): void {
     .option("--pre-commit", "Run pre-commit (code) rules only")
     .option("--json", "Output results as JSON (for agent/CI consumption)")
     .option("--check", "Exit 0 if clean, 1 if flags, 2 if fixes — no output")
-    .action(async (file: string | undefined, options: { dryRun?: boolean; fix?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean; check?: boolean }) => {
+    .action(async (file: string | undefined, options: { dryRun?: boolean; fix?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean; check?: boolean }, command: Command) => {
       let input: string;
 
       if (file === "-" || !file) {
         if (!file && process.stdin.isTTY) {
-          console.error("Usage: dgent run <file> or pipe input via stdin");
-          console.error("  dgent run src/file.ts");
-          console.error("  cat file.ts | dgent run -");
-          process.exit(1);
+          command.help();
+          return;
         }
         const chunks: Buffer[] = [];
         for await (const chunk of process.stdin) {

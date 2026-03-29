@@ -6,18 +6,21 @@ const require = createRequire(import.meta.url);
 const pkg = require("../../package.json") as { version: string };
 const VERSION = pkg.version;
 
-const LOGO = `
-  ${bold(white("d"))}${cyan("gent")} ${dim("·")} ${gray("de-agent your code")}`;
+function LOGO(): string {
+  return `\n  ${bold(white("d"))}${cyan("gent")} ${dim("·")} ${gray("de-agent your code")}`;
+}
 
-const LOGO_COMPACT = `${bold(white("d"))}${cyan("gent")}`;
+function LOGO_COMPACT(): string {
+  return `${bold(white("d"))}${cyan("gent")}`;
+}
 
 export function printBanner(): void {
-  console.error(LOGO);
+  console.error(LOGO());
   console.error(`  ${dim(`v${VERSION}`)}\n`);
 }
 
 export function getBanner(): string {
-  return `${LOGO}\n  ${dim(`v${VERSION}`)}\n`;
+  return `${LOGO()}\n  ${dim(`v${VERSION}`)}\n`;
 }
 
 export function printVersion(): void {
@@ -25,7 +28,7 @@ export function printVersion(): void {
 }
 
 export function printCompact(msg: string): void {
-  console.error(`  ${LOGO_COMPACT} ${msg}`);
+  console.error(`  ${LOGO_COMPACT()} ${msg}`);
 }
 
 // Status messages
@@ -109,14 +112,14 @@ export function printDiff(before: string, after: string): void {
 
 // Init branding
 export function printInitSuccess(hooksDir: string): void {
-  console.error(LOGO);
+  console.error(LOGO());
   console.error(`  ${green("Hooks installed")} ${dim("→")} ${gray(hooksDir)}`);
   console.error(`  ${dim("dgent will clean every commit automatically.")}`);
   console.error("");
 }
 
 export function printInitConflict(existingPath: string): void {
-  console.error(LOGO);
+  console.error(LOGO());
   console.error(`  ${red("Conflict:")} ${dim("core.hooksPath already set")}`);
   console.error(`  ${dim("→")} ${yellow(existingPath)}`);
   console.error("");
@@ -128,12 +131,12 @@ export function printInitConflict(existingPath: string): void {
 }
 
 export function printUninstallSuccess(): void {
-  console.error(`  ${LOGO_COMPACT} ${green("Hooks removed.")} ${dim("core.hooksPath unset.")}`);
+  console.error(`  ${LOGO_COMPACT()} ${green("Hooks removed.")} ${dim("core.hooksPath unset.")}`);
 }
 
 // Dry-run header
 export function printDryRunHeader(): void {
-  console.error(`  ${LOGO_COMPACT} ${dim("[")}${yellow("dry-run")}${dim("]")}`);
+  console.error(`  ${LOGO_COMPACT()} ${dim("[")}${yellow("dry-run")}${dim("]")}`);
 }
 
 export { VERSION, LOGO_COMPACT };

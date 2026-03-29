@@ -16,6 +16,7 @@ export interface DgentConfig {
     verbose: boolean;
     "log-dir": string;
   };
+  disabled?: boolean;
 }
 
 export function getConfigPath(): string {
@@ -91,8 +92,14 @@ export function loadConfig(): DgentConfig {
     }
   }
 
-  // Apply per-repo overrides (only rules section)
+  // Apply per-repo overrides
   const overrides = loadRepoOverrides();
+
+  // Check for per-repo disable
+  if (overrides && (overrides as Record<string, unknown>).disabled === true) {
+    config.disabled = true;
+  }
+
   if (overrides?.rules) {
     // Warn about disabled rules (security-relevant: a malicious repo could disable all rules)
     const disabledByOverride = Object.entries(overrides.rules)

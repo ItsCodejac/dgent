@@ -6,6 +6,7 @@ import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
 import type { Rule, Flag } from "../rules/index.js";
 import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
+import { shouldIgnoreFile } from "../config/ignore-files.js";
 import { printCompact, printSuccess, printRuleResult, printFlag } from "../ui/brand.js";
 import { dim, green, yellow, cyan, bold, white, red } from "../ui/colors.js";
 
@@ -62,10 +63,12 @@ export function registerScan(program: Command): void {
         }
       }
 
-      // Filter to code files only
+      // Filter to code files only, and respect .dgentignore
       files = files.filter((f) => {
         const ext = extname(f).toLowerCase();
-        return CODE_EXTENSIONS.has(ext) && !BINARY_EXTENSIONS.has(ext);
+        if (!CODE_EXTENSIONS.has(ext) || BINARY_EXTENSIONS.has(ext)) return false;
+        if (shouldIgnoreFile(f)) return false;
+        return true;
       });
 
       if (files.length === 0) {

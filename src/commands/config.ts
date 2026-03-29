@@ -1,5 +1,6 @@
 import type { Command } from "commander";
-import { loadConfig, saveConfig, setConfigValue, getConfigValue, formatConfigList } from "../config/index.js";
+import { unlinkSync } from "node:fs";
+import { loadConfig, saveConfig, setConfigValue, getConfigValue, formatConfigList, getConfigPath } from "../config/index.js";
 import { storeApiKey, deleteApiKey } from "../config/secrets.js";
 
 export function registerConfig(program: Command): void {
@@ -51,6 +52,36 @@ export function registerConfig(program: Command): void {
       saveConfig(updated);
       const display = value === "true" ? true : value === "false" ? false : value;
       console.log(`Set ${key} = ${String(display)}`);
+    });
+
+  config
+    .command("get <key>")
+    .description("Print a single config value by dot-notation key")
+    .action((key: string) => {
+      const current = loadConfig();
+      const value = getConfigValue(current, key);
+      if (value === undefined) {
+        console.error(`Unknown config key: ${key}`);
+        process.exit(1);
+      }
+      if (typeof value === "object" && value !== null) {
+        console.log(JSON.stringify(value, null, 2));
+      } else {
+        console.log(String(value));
+      }
+    });
+
+  config
+    .command("reset")
+    .description("Reset config to defaults")
+    .action(() => {
+      const configPath = getConfigPath();
+      try {
+        unlinkSync(configPath);
+      } catch {
+        // File may not exist — that's fine
+      }
+      console.log("Config reset to defaults.");
     });
 
   config

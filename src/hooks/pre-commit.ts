@@ -9,6 +9,7 @@ import { callSkill } from "../ai/client.js";
 import { loadSkill } from "../ai/skill-loader.js";
 import { hasConsented, promptConsent } from "./consent.js";
 import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
+import { shouldIgnoreFile } from "../config/ignore-files.js";
 import { dim, green } from "../ui/colors.js";
 import { LOGO_COMPACT } from "../ui/brand.js";
 
@@ -75,6 +76,7 @@ export async function handlePreCommit(): Promise<void> {
 
   try {
     const config = loadConfig();
+    if (config.disabled) return;
     const preCommitRules = rules.filter((r) => r.phase === "pre-commit");
     const enabledRules = preCommitRules.filter(
       (r) => config.rules[r.name] ?? r.defaultEnabled,
@@ -104,6 +106,7 @@ export async function handlePreCommit(): Promise<void> {
         console.error(`dgent: skipping ${f} (outside repository root)`);
         return false;
       }
+      if (shouldIgnoreFile(f)) return false;
       return true;
     });
     const safeFiles: string[] = [];
@@ -211,7 +214,7 @@ export async function handlePreCommit(): Promise<void> {
           if (result && result.fixed_code !== codeToFix) {
             writeFileSync(file, result.fixed_code, "utf-8");
             restage(file);
-            console.error(`  ${LOGO_COMPACT} ${green("autofix")} ${dim(file)} ${dim("→")} ${result.changes.length} ${dim("fix(es)")}`);
+            console.error(`  ${LOGO_COMPACT()} ${green("autofix")} ${dim(file)} ${dim("→")} ${result.changes.length} ${dim("fix(es)")}`);
             for (const change of result.changes) {
               console.error(`    ${dim("→")} ${dim(change.description)}`);
             }

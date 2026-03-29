@@ -8,16 +8,27 @@ export function registerStats(program: Command): void {
     .command("stats")
     .description("Show statistics on caught tells")
     .option("--all", "Include all history, not just last 30 days")
-    .action((options: { all?: boolean }) => {
-      const entries = readLogs(options.all ? 100000 : 1000);
+    .option("--since <date>", "Only include entries after this date (e.g. 2025-01-01)")
+    .action((options: { all?: boolean; since?: string }) => {
+      const entries = readLogs(options.all || options.since ? 100000 : 1000);
 
       if (entries.length === 0) {
         printCompact(dim("no data yet — commit with dgent active to start tracking"));
         return;
       }
 
-      // Filter to last 30 days unless --all
-      const cutoff = options.all ? 0 : Date.now() - 30 * 24 * 60 * 60 * 1000;
+      // Filter by --since, --all, or default 30 days
+      let cutoff: number;
+      if (options.since) {
+        const sinceDate = new Date(options.since);
+        if (isNaN(sinceDate.getTime())) {
+          console.error(`Invalid date: ${options.since}`);
+          process.exit(1);
+        }
+        cutoff = sinceDate.getTime();
+      } else {
+        cutoff = options.all ? 0 : Date.now() - 30 * 24 * 60 * 60 * 1000;
+      }
       const filtered = entries.filter((e) => new Date(e.timestamp).getTime() > cutoff);
 
       if (filtered.length === 0) {
@@ -47,7 +58,7 @@ export function registerStats(program: Command): void {
       const barWidth = 20;
 
       // Header
-      const period = options.all ? "all time" : "last 30 days";
+      const period = options.since ? `since ${options.since}` : options.all ? "all time" : "last 30 days";
       printCompact(`${dim("stats ·")} ${dim(period)}\n`);
 
       // Summary
