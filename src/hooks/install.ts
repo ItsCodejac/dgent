@@ -1,7 +1,8 @@
-import { existsSync, mkdirSync, writeFileSync, rmSync, chmodSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, rmSync, chmodSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { execSync, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { printInitSuccess, printInitConflict, printUninstallSuccess, printSuccess, printWarning, printInfo } from "../ui/brand.js";
 import { dim, cyan, yellow } from "../ui/colors.js";
 
@@ -16,8 +17,38 @@ function getCurrentHooksPath(): string | null {
   }
 }
 
+function hashFile(path: string): string {
+  try {
+    return createHash("sha256").update(readFileSync(path)).digest("hex");
+  } catch {
+    return "";
+  }
+}
+
 function isOwnedByDgent(hooksPath: string): boolean {
-  return existsSync(join(hooksPath, ".dgent"));
+  const markerPath = join(hooksPath, ".dgent");
+  if (!existsSync(markerPath)) return false;
+
+  // Verify integrity — check that hook scripts haven't been tampered with
+  try {
+    const marker = readFileSync(markerPath, "utf-8");
+    const commitMsgHash = hashFile(join(hooksPath, "commit-msg"));
+    const preCommitHash = hashFile(join(hooksPath, "pre-commit"));
+
+    const storedCommitMsg = marker.match(/commit-msg: ([a-f0-9]+)/)?.[1];
+    const storedPreCommit = marker.match(/pre-commit: ([a-f0-9]+)/)?.[1];
+
+    if (storedCommitMsg && storedCommitMsg !== commitMsgHash) {
+      printWarning("commit-msg hook has been modified outside dgent");
+    }
+    if (storedPreCommit && storedPreCommit !== preCommitHash) {
+      printWarning("pre-commit hook has been modified outside dgent");
+    }
+  } catch {
+    // If we can't verify, still treat as owned (marker exists)
+  }
+
+  return true;
 }
 
 function getDgentPath(): string {
@@ -51,7 +82,15 @@ function writeHookScripts(): void {
   writeFileSync(preCommitPath, makeHookScript("pre-commit", dgentPath), "utf-8");
   chmodSync(preCommitPath, 0o755);
 
-  writeFileSync(MARKER_FILE, `installed: ${new Date().toISOString()}\n`, "utf-8");
+  // Store hashes for integrity verification
+  const commitMsgHash = hashFile(join(HOOKS_DIR, "commit-msg"));
+  const preCommitHash = hashFile(join(HOOKS_DIR, "pre-commit"));
+  writeFileSync(MARKER_FILE, [
+    `installed: ${new Date().toISOString()}`,
+    `commit-msg: ${commitMsgHash}`,
+    `pre-commit: ${preCommitHash}`,
+  ].join("\n") + "\n", "utf-8");
+  try { chmodSync(HOOKS_DIR, 0o700); } catch { /* best effort */ }
 }
 
 export function installHooks(): void {

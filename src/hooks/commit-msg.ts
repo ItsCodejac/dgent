@@ -1,4 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { execFileSync } from "node:child_process";
 import { loadConfig } from "../config/index.js";
 import { getApiKey } from "../config/secrets.js";
 import { rules } from "../rules/index.js";
@@ -37,6 +39,21 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
   const dryRun = process.env.DGENT_DRY_RUN === "1";
 
   try {
+    // Validate msg file path is within .git directory
+    const resolved = resolve(msgFilePath);
+    try {
+      const gitDir = execFileSync("git", ["rev-parse", "--git-dir"], {
+        encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"],
+      }).trim();
+      const resolvedGitDir = resolve(gitDir);
+      if (!resolved.startsWith(resolvedGitDir)) {
+        console.error(`dgent: message file ${msgFilePath} is outside .git directory, skipping`);
+        return;
+      }
+    } catch {
+      // Can't determine git dir — proceed cautiously
+    }
+
     const config = loadConfig();
     let message = readFileSync(msgFilePath, "utf-8");
     const original = message;

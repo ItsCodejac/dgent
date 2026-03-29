@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { execSync, execFileSync } from "node:child_process";
-import { extname } from "node:path";
+import { execFileSync } from "node:child_process";
+import { extname, resolve } from "node:path";
 import { loadConfig } from "../config/index.js";
 import { getApiKey } from "../config/secrets.js";
 import { rules } from "../rules/index.js";
@@ -52,6 +52,23 @@ function restage(file: string): void {
   execFileSync("git", ["add", "--", file]);
 }
 
+function getRepoRoot(): string | null {
+  try {
+    return execFileSync("git", ["rev-parse", "--show-toplevel"], {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function isWithinRepo(file: string, repoRoot: string): boolean {
+  const resolved = resolve(file);
+  const root = resolve(repoRoot);
+  return resolved.startsWith(root + "/") || resolved === root;
+}
+
 export async function handlePreCommit(): Promise<void> {
   const dryRun = process.env.DGENT_DRY_RUN === "1";
 
@@ -78,7 +95,16 @@ export async function handlePreCommit(): Promise<void> {
     const stagedFiles = getStagedFiles();
     if (stagedFiles.length === 0) return;
 
-    const textFiles = stagedFiles.filter((f) => !isBinary(f));
+    // Path traversal protection — reject files outside repo root
+    const repoRoot = getRepoRoot();
+    const textFiles = stagedFiles.filter((f) => {
+      if (isBinary(f)) return false;
+      if (repoRoot && !isWithinRepo(f, repoRoot)) {
+        console.error(`dgent: skipping ${f} (outside repository root)`);
+        return false;
+      }
+      return true;
+    });
     const safeFiles: string[] = [];
     const mixedFiles: string[] = [];
 
@@ -185,6 +211,9 @@ export async function handlePreCommit(): Promise<void> {
             writeFileSync(file, result.fixed_code, "utf-8");
             restage(file);
             console.error(`  ${LOGO_COMPACT} ${green("autofix")} ${dim(file)} ${dim("→")} ${result.changes.length} ${dim("fix(es)")}`);
+            for (const change of result.changes) {
+              console.error(`    ${dim("→")} ${dim(change.description)}`);
+            }
             continue; // Flags resolved for this file
           }
         } catch {
