@@ -1,56 +1,77 @@
 import type { Command } from "commander";
-import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, copyFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { printCompact, printSuccess, printInfo } from "../ui/brand.js";
-import { dim, cyan } from "../ui/colors.js";
+import { dim, cyan, green } from "../ui/colors.js";
+
+function resolveIntegrationsDir(): string {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const primary = join(__dirname, "..", "..", "integrations");
+  if (existsSync(primary)) return primary;
+  const alt = join(__dirname, "..", "integrations");
+  if (existsSync(alt)) return alt;
+  throw new Error("integrations directory not found — reinstall dgent");
+}
 
 export function registerIntegrate(program: Command): void {
   program
     .command("integrate")
-    .description("Install Claude Code skills and agent integrations")
-    .action(() => {
-      const __dirname = dirname(fileURLToPath(import.meta.url));
-      const integrationsDir = join(__dirname, "..", "..", "integrations");
-      const skillsSource = join(integrationsDir, "skills");
+    .description("Install agent skills (Claude Code, OpenClaw)")
+    .option("--claude", "Install Claude Code skills only")
+    .option("--openclaw", "Install OpenClaw skill only")
+    .action((options: { claude?: boolean; openclaw?: boolean }) => {
+      const installAll = !options.claude && !options.openclaw;
 
-      // Check integrations exist
-      if (!existsSync(skillsSource)) {
-        // Try npm package path
-        const altPath = join(__dirname, "..", "integrations", "skills");
-        if (!existsSync(altPath)) {
-          printCompact("integrations not found — reinstall dgent");
-          return;
+      let integrationsDir: string;
+      try {
+        integrationsDir = resolveIntegrationsDir();
+      } catch {
+        printCompact("integrations not found — reinstall dgent");
+        return;
+      }
+
+      // Claude Code skills
+      if (installAll || options.claude) {
+        const skillsSource = join(integrationsDir, "skills");
+        if (existsSync(skillsSource)) {
+          const claudeSkills = join(homedir(), ".claude", "skills", "dgent");
+          mkdirSync(claudeSkills, { recursive: true });
+
+          const skillFiles = readdirSync(skillsSource).filter((f) => f.endsWith(".md"));
+          for (const file of skillFiles) {
+            copyFileSync(join(skillsSource, file), join(claudeSkills, file));
+          }
+          printSuccess(`Claude Code: ${skillFiles.length} skills ${dim("→")} ${dim(claudeSkills)}`);
         }
       }
 
-      const sourceDir = existsSync(skillsSource)
-        ? skillsSource
-        : join(__dirname, "..", "integrations", "skills");
+      // OpenClaw skill
+      if (installAll || options.openclaw) {
+        const openclawSource = join(integrationsDir, "openclaw");
+        if (existsSync(openclawSource)) {
+          const openclawSkills = join(homedir(), ".openclaw", "workspace", "skills", "dgent");
+          mkdirSync(openclawSkills, { recursive: true });
 
-      // Install skills to ~/.claude/skills/dgent/
-      const claudeSkills = join(homedir(), ".claude", "skills", "dgent");
-      mkdirSync(claudeSkills, { recursive: true });
-
-      const skillFiles = readdirSync(sourceDir).filter((f) => f.endsWith(".md"));
-      for (const file of skillFiles) {
-        copyFileSync(join(sourceDir, file), join(claudeSkills, file));
+          const skillFiles = readdirSync(openclawSource).filter((f) => f.endsWith(".md"));
+          for (const file of skillFiles) {
+            copyFileSync(join(openclawSource, file), join(openclawSkills, file));
+          }
+          printSuccess(`OpenClaw: skill ${dim("→")} ${dim(openclawSkills)}`);
+        }
       }
-      printSuccess(`${skillFiles.length} skills installed to ${dim(claudeSkills)}`);
 
-      // Show CLAUDE.md instructions
+      // CLAUDE.md instructions
       const claudeMd = join(integrationsDir, "CLAUDE.md");
-      const altClaudeMd = join(__dirname, "..", "integrations", "CLAUDE.md");
-      const claudeMdPath = existsSync(claudeMd) ? claudeMd : altClaudeMd;
+      if (existsSync(claudeMd) && (installAll || options.claude)) {
+        console.error("");
+        printInfo("Add dgent context to your project:");
+        console.error(`    ${cyan(`cat ${claudeMd} >> .claude/CLAUDE.md`)}`);
+      }
 
       console.error("");
-      printInfo("Add dgent context to your project:");
-      console.error(`    ${cyan(`cat ${claudeMdPath} >> .claude/CLAUDE.md`)}`);
-      console.error("");
-      printInfo("Or to your global config:");
-      console.error(`    ${cyan(`cat ${claudeMdPath} >> ~/.claude/CLAUDE.md`)}`);
+      printSuccess(`${green("done")} — restart your agent to pick up the skills`);
       console.error("");
     });
 }
