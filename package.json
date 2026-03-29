@@ -1,11 +1,11 @@
 {
-  "name": "dgent",
+  "name": "@itscojac/dgent",
   "version": "0.1.0",
   "description": "De-agent your code — clean AI tells from commits and code automatically via git hooks",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "dgent": "./dist/cli.js"
+    "dgent": "dist/cli.js"
   },
   "files": [
     "dist/",
@@ -21,7 +21,7 @@
     "preuninstall": "dgent uninstall 2>/dev/null || true"
   },
   "publishConfig": {
-    "provenance": true
+    "access": "public"
   },
   "os": [
     "darwin",
