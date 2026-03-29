@@ -1,0 +1,5 @@
+[
+  {"rule": "flag-naming", "line": 1, "message": "AI naming pattern: \"DataProcessor\" ends with \"Processor\""},
+  {"rule": "flag-naming", "line": 7, "message": "AI naming pattern: \"UserServiceHandler\" ends with \"Handler\""},
+  {"rule": "flag-naming", "line": 11, "message": "AI naming pattern: \"configManager\" ends with \"Manager\""}
+]

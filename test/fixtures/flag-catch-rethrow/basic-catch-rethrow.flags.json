@@ -1,0 +1,3 @@
+[
+  {"rule": "flag-catch-rethrow", "line": 3, "message": "Catch block only logs and re-throws — adds no value"}
+]

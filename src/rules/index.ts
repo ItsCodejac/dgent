@@ -23,5 +23,12 @@ import { stripTrailers } from "./strip-trailers.js";
 import { stripEmojis } from "./strip-emojis.js";
 import { flagMessageTone } from "./flag-message-tone.js";
 import { normalizeFormat } from "./normalize-format.js";
+import { stripSectionHeaders } from "./strip-section-headers.js";
+import { stripEmojiComments } from "./strip-emoji-comments.js";
+import { flagNaming } from "./flag-naming.js";
+import { flagCatchRethrow } from "./flag-catch-rethrow.js";
 
-export const rules: Rule[] = [stripTrailers, stripEmojis, flagMessageTone, normalizeFormat];
+export const rules: Rule[] = [
+  stripTrailers, stripEmojis, flagMessageTone, normalizeFormat,
+  stripSectionHeaders, stripEmojiComments, flagNaming, flagCatchRethrow,
+];

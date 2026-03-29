@@ -1,0 +1,3 @@
+[
+  {"rule": "flag-naming", "line": 1, "message": "Overlong identifier (49 chars): \"processAndValidateUserInputDataFromExternalSource\""}
+]
