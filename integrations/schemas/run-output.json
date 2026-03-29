@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://dgent.dev/schemas/run-output.json",
   "title": "dgent run --json output",
-  "description": "JSON output produced by `dgent run --json <file>`. Exit codes: 0 = clean, 1 = flags found, 2 = fixes applied.",
+  "description": "JSON output produced by `dgent run --json <file>`. Exit codes: 0 = clean or fixes applied, 1 = flags found.",
   "type": "object",
   "required": ["file", "phase", "clean", "fixes", "flags"],
   "additionalProperties": false,

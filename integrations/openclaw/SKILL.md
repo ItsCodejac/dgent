@@ -23,7 +23,7 @@ Clean AI tells from code and commit messages. Runs as git hooks automatically, o
 dgent run --json <file>
 ```
 
-Returns JSON with `clean`, `fixes[]`, `flags[]`, and `output` (cleaned content). Exit codes: 0 = clean, 1 = flags, 2 = fixes applied.
+Returns JSON with `clean`, `fixes[]`, `flags[]`, and `output` (cleaned content). Exit codes: 0 = clean or fixes applied, 1 = flags found.
 
 ## Quick check — exit code only
 
@@ -31,7 +31,7 @@ Returns JSON with `clean`, `fixes[]`, `flags[]`, and `output` (cleaned content).
 dgent run --check <file>
 ```
 
-Silent. Exit 0 if clean, 1 if flags, 2 if fixes. Use in pre-commit scripts.
+Silent. Exit 0 if clean or fixes applied, 1 if flags found. Use in pre-commit scripts.
 
 ## Scan entire directory
 
