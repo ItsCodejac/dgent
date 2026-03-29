@@ -28,7 +28,7 @@ function isBinary(file: string): boolean {
 
 function getStagedFiles(): string[] {
   try {
-    const output = execSync("git diff --cached --name-only --diff-filter=ACM", {
+    const output = execFileSync("git", ["diff", "--cached", "--name-only", "--diff-filter=ACM"], {
       encoding: "utf-8",
     }).trim();
     return output ? output.split("\n") : [];
@@ -49,7 +49,7 @@ function hasUnstagedChanges(file: string): boolean {
 }
 
 function restage(file: string): void {
-  execFileSync("git", ["add", file]);
+  execFileSync("git", ["add", "--", file]);
 }
 
 export async function handlePreCommit(): Promise<void> {

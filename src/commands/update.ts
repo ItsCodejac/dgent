@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { VERSION, printCompact } from "../ui/brand.js";
 import { dim, green, yellow, cyan } from "../ui/colors.js";
 
@@ -12,7 +12,7 @@ export function registerUpdate(program: Command): void {
 
       let latest: string;
       try {
-        latest = execSync("npm view dgent version", {
+        latest = execFileSync("npm", ["view", "dgent", "version"], {
           encoding: "utf-8",
           stdio: ["pipe", "pipe", "pipe"],
         }).trim();
@@ -30,7 +30,7 @@ export function registerUpdate(program: Command): void {
       console.error(`  ${dim("Updating")} v${VERSION} ${dim("→")} v${latest}`);
 
       try {
-        execSync("npm update -g dgent", { stdio: "inherit" });
+        execFileSync("npm", ["update", "-g", "dgent"], { stdio: "inherit" });
         console.error(`  ${green("✓")} Updated to v${latest}`);
       } catch {
         console.error(`  ${yellow("!")} Update failed.`);

@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { DEFAULT_CONFIG } from "./defaults.js";
 
 export interface DgentConfig {
@@ -45,7 +45,7 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
 
 function getRepoRoot(): string | null {
   try {
-    return execSync("git rev-parse --show-toplevel", {
+    return execFileSync("git", ["rev-parse", "--show-toplevel"], {
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();

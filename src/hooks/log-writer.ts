@@ -1,14 +1,14 @@
 import { writeFileSync, mkdirSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import type { Flag } from "../rules/index.js";
 
 const LOG_DIR = join(homedir(), ".local", "share", "dgent", "logs");
 
 function getCommitHash(): string | null {
   try {
-    return execSync("git rev-parse --short HEAD", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    return execFileSync("git", ["rev-parse", "--short", "HEAD"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
   } catch {
     return null;
   }

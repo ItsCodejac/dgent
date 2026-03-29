@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
@@ -9,9 +9,17 @@ import { getApiKey } from "../config/secrets.js";
 import { readLogs } from "../hooks/log-writer.js";
 import { rules } from "../rules/index.js";
 
-function safeExec(cmd: string): string {
+function safeGit(...args: string[]): string {
   try {
-    return execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    return execFileSync("git", args, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+  } catch {
+    return "(unavailable)";
+  }
+}
+
+function safeBin(bin: string, ...args: string[]): string {
+  try {
+    return execFileSync(bin, args, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
   } catch {
     return "(unavailable)";
   }
@@ -23,7 +31,7 @@ export function registerRage(program: Command): void {
     .description("Print debug info for bug reports")
     .action(() => {
       const config = loadConfig();
-      const hooksPath = safeExec("git config --global core.hooksPath");
+      const hooksPath = safeGit("config", "--global", "core.hooksPath");
       const hooksDir = join(homedir(), ".config", "dgent", "hooks");
       const hasMarker = existsSync(join(hooksDir, ".dgent"));
       const hasConsent = existsSync(join(homedir(), ".config", "dgent", "consent"));
@@ -31,18 +39,17 @@ export function registerRage(program: Command): void {
       const configPath = getConfigPath();
       const hasConfig = existsSync(configPath);
       const recentLogs = readLogs(3);
-      const nodeVersion = safeExec("node --version");
-      const npmVersion = safeExec("npm --version");
-      const gitVersion = safeExec("git --version");
+      const nodeVersion = safeBin("node", "--version");
+      const npmVersion = safeBin("npm", "--version");
+      const gitVersion = safeBin("git", "--version");
       const platform = `${process.platform} ${process.arch}`;
 
       const enabledRules = rules.filter((r) => config.rules[r.name] ?? r.defaultEnabled);
       const disabledRules = rules.filter((r) => !(config.rules[r.name] ?? r.defaultEnabled));
 
-      // Check for repo-level overrides
       let repoOverride = "(none)";
       try {
-        const root = safeExec("git rev-parse --show-toplevel");
+        const root = safeGit("rev-parse", "--show-toplevel");
         const overridePath = join(root, ".dgent.json");
         if (existsSync(overridePath)) {
           repoOverride = readFileSync(overridePath, "utf-8").trim();
@@ -53,8 +60,8 @@ export function registerRage(program: Command): void {
         `dgent v${VERSION}`,
         ``,
         `## Git Identity`,
-        `user.name: ${safeExec("git config --global user.name")}`,
-        `user.email: ${safeExec("git config --global user.email")}`,
+        `user.name: ${safeGit("config", "--global", "user.name")}`,
+        `user.email: ${safeGit("config", "--global", "user.email")}`,
         ``,
         `## Environment`,
         `Platform: ${platform}`,

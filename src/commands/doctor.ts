@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
@@ -8,9 +8,9 @@ import { dim, cyan, yellow, green, red } from "../ui/colors.js";
 import { getApiKey } from "../config/secrets.js";
 import { loadConfig, getConfigPath } from "../config/index.js";
 
-function safeExec(cmd: string): string | null {
+function safeGit(...args: string[]): string | null {
   try {
-    return execSync(cmd, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    return execFileSync("git", args, { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
   } catch {
     return null;
   }
@@ -38,7 +38,7 @@ export function registerDoctor(program: Command): void {
       const checks: Check[] = [];
 
       // 1. Hooks installed?
-      const hooksPath = safeExec("git config --global core.hooksPath");
+      const hooksPath = safeGit("config", "--global", "core.hooksPath");
       const hooksDir = join(homedir(), ".config", "dgent", "hooks");
       const hasMarker = existsSync(join(hooksDir, ".dgent"));
 
@@ -74,8 +74,8 @@ export function registerDoctor(program: Command): void {
       }
 
       // 3. Git identity
-      const gitName = safeExec("git config --global user.name") ?? safeExec("git config user.name");
-      const gitEmail = safeExec("git config --global user.email") ?? safeExec("git config user.email");
+      const gitName = safeGit("config", "--global", "user.name") ?? safeGit("config", "user.name");
+      const gitEmail = safeGit("config", "--global", "user.email") ?? safeGit("config", "user.email");
 
       if (gitName && gitEmail) {
         const combined = `${gitName} ${gitEmail}`.toLowerCase();
@@ -144,7 +144,7 @@ export function registerDoctor(program: Command): void {
       }
 
       // 6. Repo overrides?
-      const repoRoot = safeExec("git rev-parse --show-toplevel");
+      const repoRoot = safeGit("rev-parse", "--show-toplevel");
       if (repoRoot) {
         const overridePath = join(repoRoot, ".dgent.json");
         if (existsSync(overridePath)) {

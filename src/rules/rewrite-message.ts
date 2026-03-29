@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import type { Rule, RuleResult } from "./index.js";
 import { loadConfig } from "../config/index.js";
 import { getApiKey } from "../config/secrets.js";
@@ -23,7 +23,7 @@ interface RewriteResult {
 
 function getRecentCommitMessages(count: number = 10): string[] {
   try {
-    const output = execSync(`git log --format=%s -n ${count}`, {
+    const output = execFileSync("git", ["log", "--format=%s", "-n", String(count)], {
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();

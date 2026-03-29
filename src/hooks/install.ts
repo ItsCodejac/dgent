@@ -10,7 +10,7 @@ const MARKER_FILE = join(HOOKS_DIR, ".dgent");
 
 function getCurrentHooksPath(): string | null {
   try {
-    return execSync("git config --global core.hooksPath", { encoding: "utf-8" }).trim() || null;
+    return execFileSync("git", ["config", "--global", "core.hooksPath"], { encoding: "utf-8" }).trim() || null;
   } catch {
     return null;
   }
@@ -69,7 +69,7 @@ export function installHooks(): void {
   }
 
   writeHookScripts();
-  execSync(`git config --global core.hooksPath "${HOOKS_DIR}"`);
+  execFileSync("git", ["config", "--global", "core.hooksPath", HOOKS_DIR]);
   printInitSuccess(HOOKS_DIR);
 
   // Check git identity for agent-looking config
@@ -83,8 +83,8 @@ const AGENT_PATTERNS = [
 
 function checkGitIdentity(): void {
   try {
-    const name = execSync("git config --global user.name", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
-    const email = execSync("git config --global user.email", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    const name = execFileSync("git", ["config", "--global", "user.name"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    const email = execFileSync("git", ["config", "--global", "user.email"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
 
     const nameOrEmail = `${name} ${email}`.toLowerCase();
     const looksLikeAgent = AGENT_PATTERNS.some((p) => nameOrEmail.includes(p));
@@ -131,7 +131,7 @@ export function uninstallHooks(): void {
   } catch { /* best effort */ }
 
   try {
-    execSync("git config --global --unset core.hooksPath");
+    execFileSync("git", ["config", "--global", "--unset", "core.hooksPath"]);
   } catch { /* may already be unset */ }
 
   printUninstallSuccess();
