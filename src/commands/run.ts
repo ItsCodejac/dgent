@@ -1,9 +1,9 @@
 import type { Command } from "commander";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
 import type { Rule, Flag } from "../rules/index.js";
-import { printCompact, printRuleResult, printFlag } from "../ui/brand.js";
+import { printCompact, printRuleResult, printFlag, printSuccess } from "../ui/brand.js";
 import { dim, green } from "../ui/colors.js";
 
 interface JsonResult {
@@ -20,10 +20,11 @@ export function registerRun(program: Command): void {
     .command("run [file]")
     .description("Manual pass on a file or stdin diff")
     .option("--dry-run", "Preview changes without applying")
+    .option("--fix", "Write cleaned output back to the file (in-place)")
     .option("--commit-msg", "Run commit message rules only")
     .option("--pre-commit", "Run pre-commit (code) rules only")
     .option("--json", "Output results as JSON (for agent/CI consumption)")
-    .action(async (file: string | undefined, options: { dryRun?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean }) => {
+    .action(async (file: string | undefined, options: { dryRun?: boolean; fix?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean }) => {
       let input: string;
 
       if (file === "-" || !file) {
@@ -115,7 +116,10 @@ export function registerRun(program: Command): void {
       }
       console.error("");
 
-      if (output !== input && !options.dryRun) {
+      if (output !== input && options.fix && file && file !== "-") {
+        writeFileSync(file, output, "utf-8");
+        printSuccess(`${file} fixed`);
+      } else if (output !== input && !options.dryRun && !options.fix) {
         process.stdout.write(output);
       } else if (options.dryRun && output !== input) {
         console.error(`  ${dim("dry-run — changes not applied")}`);

@@ -11,6 +11,7 @@ import { registerTest } from "./commands/test.js";
 import { registerUpdate } from "./commands/update.js";
 import { registerHook } from "./commands/hook.js";
 import { registerIntegrate } from "./commands/integrate.js";
+import { registerRage } from "./commands/rage.js";
 import { getBanner, VERSION } from "./ui/brand.js";
 
 const program = new Command();
@@ -32,6 +33,7 @@ registerLog(program);
 registerTest(program);
 registerUpdate(program);
 registerIntegrate(program);
+registerRage(program);
 registerHook(program);
 
 program.parse();

@@ -18,6 +18,29 @@ AI agents speed up your workflow, but their output has tells:
 - Section header comments in 30-line files
 - Words like "enhance", "streamline", "comprehensive"
 
+### Before dgent
+
+```
+✨ Implement caching to enhance performance
+
+This commit adds Redis caching for API responses
+to streamline the data fetching process.
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+### After dgent
+
+```
+Implement caching to enhance performance     ← emoji stripped
+                                              ← trailer removed
+This commit adds Redis caching for API        ← "enhance" flagged
+responses to streamline the data fetching     ← "this commit" flagged
+process.                                      ← "streamline" flagged
+```
+
+Fixes are automatic. Flags print as warnings so you can decide.
+
 Fixing these manually costs time proportional to the time the agent saved.
 
 ## Install
@@ -60,15 +83,22 @@ dgent installs two git hooks (`commit-msg` and `pre-commit`) that clean agent ou
 ## Commands
 
 ```sh
-dgent init          # Install global git hooks
-dgent uninstall     # Remove hooks
-dgent config list   # Show current config
-dgent config set <key> <value>   # Change a setting
-dgent run <file>    # Manual pass on a file
-dgent test          # Run fixture suite
-dgent log           # Show recent flags
-dgent update        # Self-update via npm
+dgent init              # Install global git hooks
+dgent uninstall         # Remove hooks
+dgent run <file>        # Check a file for tells
+dgent run --fix <file>  # Fix a file in place
+dgent run --json <file> # Structured output for agents/CI
+dgent config list       # Show current config
+dgent config set <k> <v>  # Change a setting
+dgent review            # Review flags from last commit
+dgent log               # Show recent flag history
+dgent integrate         # Install Claude Code skills
+dgent rage              # Print debug info for bug reports
+dgent test              # Run fixture suite
+dgent update            # Self-update via npm
 ```
+
+Try it without installing: `npx dgent run --json <file>`
 
 ## Configuration
 

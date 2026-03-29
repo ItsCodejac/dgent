@@ -19,6 +19,9 @@
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
+  "publishConfig": {
+    "provenance": true
+  },
   "engines": {
     "node": ">=18"
   },
@@ -33,12 +36,27 @@
     "developer-tools",
     "linter",
     "copilot",
-    "claude"
+    "claude",
+    "cursor",
+    "codex",
+    "lint",
+    "pre-commit",
+    "commit-msg",
+    "code-review",
+    "clean-code",
+    "ai-detection",
+    "typescript",
+    "javascript",
+    "python"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/cojac/dgent"
+  },
+  "homepage": "https://github.com/cojac/dgent",
+  "bugs": {
+    "url": "https://github.com/cojac/dgent/issues"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
