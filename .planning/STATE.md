@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Every agent commit that lands should look like it was written by a developer who knows the codebase, not by a tool following a template.
-**Current focus:** Phase 2 — Message Rules
+**Current focus:** Phase 3 — Hook Lifecycle
 
 ## Current Position
 
-Phase: 2 of 6 (Message Rules)
+Phase: 3 of 6 (Hook Lifecycle)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-03-28 — Phase 1 complete
+Last activity: 2026-03-28 — Phase 2 complete
 
-Progress: █░░░░░░░░░ 3/17 plans (18%)
+Progress: ██░░░░░░░░ 5/15 plans (33%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 5
 - Average duration: —
 - Total execution time: —
 
@@ -28,6 +28,7 @@ Progress: █░░░░░░░░░ 3/17 plans (18%)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3/3 | — | — |
+| 2. Message Rules | 2/2 | — | — |
 
 **Recent Trend:**
 - Last 5 plans: —
@@ -37,13 +38,11 @@ Progress: █░░░░░░░░░ 3/17 plans (18%)
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- npm global install over Bun compile + Homebrew (simpler build pipeline)
+- npm global install over Bun compile + Homebrew
 - ESM with Node16 module resolution
-- Plain fs read/write for config (no config library)
-- tsconfig needs `"types": ["node"]` for node: imports
+- Plain fs read/write for config
+- Fixture pairs with .flags.json for flag rule testing
+- normalize-format only acts on known conventional commit types
 
 ### Deferred Issues
 
@@ -56,5 +55,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Phase 1 complete, all 3 plans executed
+Stopped at: Phase 2 complete, all commit-msg rules working (22/22 fixtures pass)
 Resume file: None
