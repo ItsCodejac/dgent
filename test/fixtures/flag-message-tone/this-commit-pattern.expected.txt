@@ -1,0 +1,3 @@
+fix: resolve auth bug
+
+This commit fixes the token refresh logic.

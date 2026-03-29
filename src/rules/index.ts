@@ -21,5 +21,7 @@ export interface Flag {
 
 import { stripTrailers } from "./strip-trailers.js";
 import { stripEmojis } from "./strip-emojis.js";
+import { flagMessageTone } from "./flag-message-tone.js";
+import { normalizeFormat } from "./normalize-format.js";
 
-export const rules: Rule[] = [stripTrailers, stripEmojis];
+export const rules: Rule[] = [stripTrailers, stripEmojis, flagMessageTone, normalizeFormat];
