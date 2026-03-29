@@ -10,13 +10,18 @@ import { registerLog } from "./commands/log.js";
 import { registerTest } from "./commands/test.js";
 import { registerUpdate } from "./commands/update.js";
 import { registerHook } from "./commands/hook.js";
+import { printBanner, VERSION } from "./ui/brand.js";
 
 const program = new Command();
 
 program
   .name("dgent")
   .description("Strip AI tells from agent output")
-  .version("0.1.0");
+  .version(VERSION)
+  .addHelpText("beforeAll", () => {
+    printBanner();
+    return "";
+  });
 
 registerInit(program);
 registerUninstall(program);

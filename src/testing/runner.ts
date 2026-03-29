@@ -1,6 +1,8 @@
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, basename, extname } from "node:path";
 import type { Rule, Flag } from "../rules/index.js";
+import { printTestPass, printTestFail, printTestRule, printTestSummary } from "../ui/brand.js";
+import { dim } from "../ui/colors.js";
 
 interface FixturePair {
   name: string;
@@ -129,18 +131,18 @@ export async function runAllFixtures(
   for (const rule of targetRules) {
     const pairs = discoverFixtures(fixturesDir, rule.name);
     if (pairs.length === 0) {
-      console.log(`  ${rule.name}: no fixtures found`);
+      console.log(`  ${dim(rule.name + ": no fixtures")}`);
       continue;
     }
 
-    console.log(`  ${rule.name}:`);
+    printTestRule(rule.name);
     for (const pair of pairs) {
       const result = await runFixture(rule, pair, options.update ?? false);
       if (result.passed) {
-        console.log(`    ✓ ${result.name}`);
+        printTestPass(result.name);
         passed++;
       } else {
-        console.log(`    ✗ ${result.name}`);
+        printTestFail(result.name);
         if (result.diff) console.log(result.diff);
         if (result.flagsDiff) console.log(result.flagsDiff);
         failed++;
@@ -149,8 +151,7 @@ export async function runAllFixtures(
   }
 
   const total = passed + failed;
-  console.log(`\n  ${passed}/${total} passed`);
-  if (failed > 0) console.log(`  ${failed} failed`);
+  printTestSummary(passed, total, failed);
 
   return { passed, failed, total };
 }

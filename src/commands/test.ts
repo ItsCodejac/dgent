@@ -3,6 +3,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAllFixtures } from "../testing/runner.js";
 import { rules } from "../rules/index.js";
+import { printCompact } from "../ui/brand.js";
+import { dim } from "../ui/colors.js";
 
 export function registerTest(program: Command): void {
   program
@@ -14,7 +16,7 @@ export function registerTest(program: Command): void {
       const __dirname = dirname(fileURLToPath(import.meta.url));
       const fixturesDir = join(__dirname, "..", "..", "test", "fixtures");
 
-      console.log("dgent test\n");
+      printCompact(dim("test\n"));
       const { failed } = await runAllFixtures(rules, fixturesDir, options);
       process.exit(failed > 0 ? 1 : 0);
     });
