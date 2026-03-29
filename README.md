@@ -88,6 +88,8 @@ dgent uninstall         # Remove hooks
 dgent run <file>        # Check a file for tells
 dgent run --fix <file>  # Fix a file in place
 dgent run --json <file> # Structured output for agents/CI
+dgent fix <file>        # AI-powered fix for flagged issues (requires API key)
+dgent fix --commit-msg  # AI-powered commit message cleanup
 dgent config list       # Show current config
 dgent config set <k> <v>  # Change a setting
 dgent review            # Review flags from last commit
@@ -124,13 +126,36 @@ Drop a `.dgent.json` in your repo root to override rules for that project:
 
 ## AI skill layer (optional)
 
-dgent includes an optional AI layer that calls Claude for tasks that need judgment — like rewriting commit messages to match your repo's voice.
+dgent includes an optional AI layer that calls Claude for tasks that need judgment.
 
 ```sh
 dgent config set api-key <your-anthropic-api-key>
 dgent config set ai.enabled true
+```
+
+### Manual AI fix
+
+```sh
+dgent fix src/file.ts              # Fix flagged code issues
+dgent fix --commit-msg message.txt # Fix flagged commit message
+dgent fix --dry-run src/file.ts    # Preview without applying
+```
+
+### Automatic AI fix on every commit
+
+```sh
+dgent config set ai.autofix true
+```
+
+With autofix enabled, the hooks automatically call Claude to resolve flags during commit — renaming `DataProcessor` to something specific, removing empty catch-rethrow blocks, cleaning AI vocabulary from messages. If the AI can't fix it or the call fails, flags print as warnings instead.
+
+### Commit message rewriting
+
+```sh
 dgent config set rules.rewrite-message true
 ```
+
+Rewrites commit messages to match your repo's historical voice (pulls last 10 messages from `git log` for style matching).
 
 The API key is stored in your macOS Keychain (or `~/.local/share/dgent/.key` on Linux). You can also set `ANTHROPIC_API_KEY` as an environment variable.
 

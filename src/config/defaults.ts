@@ -18,6 +18,7 @@ export const DEFAULT_CONFIG: DgentConfig = {
   },
   ai: {
     enabled: false,
+    autofix: false,
     model: "claude-sonnet-latest",
     skill: "bundled",
   },

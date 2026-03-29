@@ -2,9 +2,14 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { extname } from "node:path";
 import { loadConfig } from "../config/index.js";
+import { getApiKey } from "../config/secrets.js";
 import { rules } from "../rules/index.js";
 import type { Flag } from "../rules/index.js";
+import { callSkill } from "../ai/client.js";
+import { loadSkill } from "../ai/skill-loader.js";
 import { hasConsented, promptConsent } from "./consent.js";
+import { dim, green } from "../ui/colors.js";
+import { LOGO_COMPACT } from "../ui/brand.js";
 
 const BINARY_EXTENSIONS = new Set([
   ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".svg",
@@ -136,6 +141,51 @@ export async function handlePreCommit(): Promise<void> {
         restage(file);
         if (config.output.verbose) {
           console.error(`dgent: modified ${file} (${rulesApplied.join(", ")})`);
+        }
+      }
+
+      // AI autofix for file flags
+      if (!dryRun && fileFlags.length > 0 && config.ai.enabled && config.ai.autofix && getApiKey()) {
+        try {
+          const skill = loadSkill();
+          const flagDescriptions = fileFlags
+            .map((f) => `- Line ${f.line}: [${f.rule}] ${f.message}`)
+            .join("\n");
+
+          const codeToFix = modified; // Use already-deterministically-cleaned version
+          const userContent = [
+            "## Fix these flags in the code:",
+            flagDescriptions,
+            "",
+            "## Code:",
+            "```",
+            codeToFix,
+            "```",
+          ].join("\n");
+
+          const FIX_CODE_SCHEMA = {
+            type: "object",
+            properties: {
+              fixed_code: { type: "string" },
+              changes: { type: "array", items: { type: "object", properties: { flag: { type: "string" }, description: { type: "string" } }, required: ["flag", "description"] } },
+            },
+            required: ["fixed_code", "changes"],
+          } as const;
+
+          const result = await callSkill<{ fixed_code: string; changes: Array<{ flag: string; description: string }> }>(
+            skill,
+            userContent,
+            FIX_CODE_SCHEMA as unknown as Record<string, unknown>,
+          );
+
+          if (result && result.fixed_code !== codeToFix) {
+            writeFileSync(file, result.fixed_code, "utf-8");
+            restage(file);
+            console.error(`  ${LOGO_COMPACT} ${green("autofix")} ${dim(file)} ${dim("→")} ${result.changes.length} ${dim("fix(es)")}`);
+            continue; // Flags resolved for this file
+          }
+        } catch {
+          // AI autofix failed, fall through to collect flags
         }
       }
 

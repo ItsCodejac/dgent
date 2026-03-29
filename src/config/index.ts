@@ -8,6 +8,7 @@ export interface DgentConfig {
   rules: Record<string, boolean>;
   ai: {
     enabled: boolean;
+    autofix: boolean;
     model: string;
     skill: string;
   };
