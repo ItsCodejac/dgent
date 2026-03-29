@@ -17,7 +17,7 @@ export function registerHook(program: Command): void {
             console.error("dgent hook commit-msg: no message file provided");
             process.exit(0);
           }
-          handleCommitMsg(msgFile);
+          await handleCommitMsg(msgFile);
           break;
         }
         case "pre-commit":

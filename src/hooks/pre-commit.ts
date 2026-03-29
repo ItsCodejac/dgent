@@ -108,7 +108,7 @@ export async function handlePreCommit(): Promise<void> {
       const rulesApplied: string[] = [];
 
       for (const rule of enabledRules) {
-        const result = rule.apply(modified);
+        const result = await rule.apply(modified);
         if (result.changed) {
           modified = result.output;
           rulesApplied.push(rule.name);

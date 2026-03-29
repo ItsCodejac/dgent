@@ -3,7 +3,7 @@ export interface Rule {
   phase: "commit-msg" | "pre-commit";
   type: "fix" | "flag";
   defaultEnabled: boolean;
-  apply(input: string): RuleResult;
+  apply(input: string): RuleResult | Promise<RuleResult>;
 }
 
 export interface RuleResult {
@@ -27,8 +27,10 @@ import { stripSectionHeaders } from "./strip-section-headers.js";
 import { stripEmojiComments } from "./strip-emoji-comments.js";
 import { flagNaming } from "./flag-naming.js";
 import { flagCatchRethrow } from "./flag-catch-rethrow.js";
+import { rewriteMessage } from "./rewrite-message.js";
 
 export const rules: Rule[] = [
   stripTrailers, stripEmojis, flagMessageTone, normalizeFormat,
   stripSectionHeaders, stripEmojiComments, flagNaming, flagCatchRethrow,
+  rewriteMessage,
 ];

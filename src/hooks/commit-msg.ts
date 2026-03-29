@@ -3,7 +3,7 @@ import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
 import type { Flag } from "../rules/index.js";
 
-export function handleCommitMsg(msgFilePath: string): void {
+export async function handleCommitMsg(msgFilePath: string): Promise<void> {
   const dryRun = process.env.DGENT_DRY_RUN === "1";
 
   try {
@@ -20,7 +20,7 @@ export function handleCommitMsg(msgFilePath: string): void {
       const enabled = config.rules[rule.name] ?? rule.defaultEnabled;
       if (!enabled) continue;
 
-      const result = rule.apply(message);
+      const result = await rule.apply(message);
 
       if (result.changed) {
         message = result.output;

@@ -79,10 +79,10 @@ function compareFlags(expected: unknown[], actual: Flag[]): { match: boolean; di
   return { match: false, diff: `  Expected flags:\n${expStr}\n  Actual flags:\n${actStr}` };
 }
 
-export function runFixture(rule: Rule, pair: FixturePair, update: boolean): FixtureResult {
+export async function runFixture(rule: Rule, pair: FixturePair, update: boolean): Promise<FixtureResult> {
   const input = readFileSync(pair.inputPath, "utf-8");
   const expected = readFileSync(pair.expectedPath, "utf-8");
-  const result = rule.apply(input);
+  const result = await rule.apply(input);
 
   if (update) {
     writeFileSync(pair.expectedPath, result.output, "utf-8");
@@ -111,11 +111,11 @@ export function runFixture(rule: Rule, pair: FixturePair, update: boolean): Fixt
   };
 }
 
-export function runAllFixtures(
+export async function runAllFixtures(
   rules: Rule[],
   fixturesDir: string,
   options: { rule?: string; update?: boolean },
-): { passed: number; failed: number; total: number } {
+): Promise<{ passed: number; failed: number; total: number }> {
   const targetRules = options.rule ? rules.filter((r) => r.name === options.rule) : rules;
 
   if (options.rule && targetRules.length === 0) {
@@ -135,7 +135,7 @@ export function runAllFixtures(
 
     console.log(`  ${rule.name}:`);
     for (const pair of pairs) {
-      const result = runFixture(rule, pair, options.update ?? false);
+      const result = await runFixture(rule, pair, options.update ?? false);
       if (result.passed) {
         console.log(`    ✓ ${result.name}`);
         passed++;
