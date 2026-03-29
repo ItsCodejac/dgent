@@ -72,4 +72,34 @@ registerHook(program);
 registerCompletions(program);
 registerCheckStaged(program);
 
-program.parse();
+// Default action: no subcommand = interactive dashboard
+program.action(async () => {
+  if (process.stdout.isTTY) {
+    try {
+      const { loadConfig } = await import("./config/index.js");
+      const { readLogs } = await import("./hooks/log-writer.js");
+      const { renderDashboard } = await import("./tui/render.js");
+      const { spawnSync } = await import("node:child_process");
+
+      const config = loadConfig();
+      const logs = readLogs(20);
+
+      let selectedAction = "";
+
+      await renderDashboard(config, logs, VERSION, (action) => {
+        selectedAction = action;
+      });
+
+      // Launch the selected subcommand
+      if (selectedAction) {
+        spawnSync(process.argv[0], [process.argv[1], selectedAction], { stdio: "inherit" });
+      }
+    } catch {
+      program.help();
+    }
+  } else {
+    program.help();
+  }
+});
+
+program.parseAsync();
