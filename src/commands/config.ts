@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { loadConfig, saveConfig, setConfigValue, formatConfigList } from "../config/index.js";
+import { storeApiKey, deleteApiKey } from "../config/secrets.js";
 
 export function registerConfig(program: Command): void {
   const config = program
@@ -10,6 +11,18 @@ export function registerConfig(program: Command): void {
     .command("set <key> <value>")
     .description("Set a config value")
     .action((key: string, value: string) => {
+      // Special handling for api-key — store securely, not in config.json
+      if (key === "api-key") {
+        if (value === "" || value === "delete" || value === "remove") {
+          deleteApiKey();
+          console.log("API key removed.");
+        } else {
+          storeApiKey(value);
+          console.log("API key stored securely.");
+        }
+        return;
+      }
+
       const current = loadConfig();
       const updated = setConfigValue(current, key, value);
       saveConfig(updated);
