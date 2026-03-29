@@ -104,7 +104,7 @@ dgent scan --fix [dir]      # Scan and auto-fix
 dgent scan --json [dir]     # Structured output for CI
 dgent run <file>            # Check a single file
 dgent run --fix <file>      # Fix a file in place
-dgent run --check <file>    # Silent — exit 0 clean, 1 flags
+dgent run --check <file>    # Silent — exit 0 clean/fixed, 1 flags
 dgent run --json <file>     # Structured output for agents
 dgent fix <file>            # AI-powered fix (requires API key)
 dgent rules                 # List all rules with patterns
@@ -145,6 +145,8 @@ Drop a `.dgent.json` in your repo root to override rules for that project:
 }
 ```
 
+Nested `.dgent.json` files (e.g., in monorepo packages) are not yet supported.
+
 ## AI skill layer (optional)
 
 dgent includes an optional AI layer that calls Claude for tasks that need judgment.
@@ -180,6 +182,8 @@ Rewrites commit messages to match your repo's historical voice (pulls last 10 me
 
 The API key is stored in your macOS Keychain (or `~/.local/share/dgent/.key` on Linux). You can also set `ANTHROPIC_API_KEY` as an environment variable.
 
+Override the bundled AI skill prompt by placing a custom file at `~/.config/dgent/skill.md`.
+
 The AI layer is entirely optional. Without it, dgent runs purely deterministic rules with zero latency.
 
 ## Inline ignores
@@ -214,6 +218,7 @@ Scans PR diffs for tells and posts results as a comment. Optionally make it a re
 - First time dgent modifies staged files, it **asks for consent**. After that, it's silent.
 - Use `DGENT_DRY_RUN=1 git commit -m "..."` to preview changes without applying.
 - Use `dgent run --dry-run <file>` to test rules on any file.
+- Note: Git GUIs (VS Code, GitKraken, Tower) may not display dgent's terminal output. Use `dgent log` or `dgent review` to see what dgent cleaned on your last commit.
 
 ## Agent integrations
 
@@ -237,7 +242,7 @@ This installs skills to `~/.claude/skills/dgent/` and prints instructions for ad
 dgent run --json src/file.ts
 ```
 
-Returns structured JSON with fixes, flags, and cleaned output. Exit codes: `0` = clean, `1` = flags found, `2` = fixes applied.
+Returns structured JSON with fixes, flags, and cleaned output. Exit codes: `0` = clean or fixes applied (success), `1` = flags found (needs attention).
 
 ### LLM-readable docs
 

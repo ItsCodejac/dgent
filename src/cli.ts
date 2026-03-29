@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+// Node.js version check — must run before any imports that may use modern syntax
+const [major] = process.versions.node.split(".").map(Number);
+if (major < 18) {
+  console.error(`dgent requires Node.js >= 18. You are running Node.js ${process.versions.node}.`);
+  process.exit(1);
+}
+
 import { Command } from "commander";
 import { registerInit } from "./commands/init.js";
 import { registerUninstall } from "./commands/uninstall.js";

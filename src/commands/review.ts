@@ -7,7 +7,7 @@ import { dim, yellow, cyan } from "../ui/colors.js";
 export function registerReview(program: Command): void {
   program
     .command("review")
-    .description("Review flags from the last commit(s)")
+    .description("Show flags from recent commits")
     .option("--count <n>", "Number of recent commits to review", "1")
     .action(async (options: { count: string }) => {
       const count = parseInt(options.count, 10) || 1;

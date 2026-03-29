@@ -66,14 +66,16 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const body = `## dgent · de-agent your code
-
-            AI tells detected in this PR:
-
-            ${{ steps.scan.outputs.results }}
-
-            ---
-            *Run \`dgent fix <file>\` to resolve flags with AI, or \`dgent scan --fix\` to auto-fix.*`;
+            const body = [
+              '## dgent \u00b7 de-agent your code',
+              '',
+              'AI tells detected in this PR:',
+              '',
+              `${{ steps.scan.outputs.results }}`,
+              '',
+              '---',
+              '*Run `dgent fix <file>` to resolve flags with AI, or `dgent scan --fix` to auto-fix.*',
+            ].join('\n');
 
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({

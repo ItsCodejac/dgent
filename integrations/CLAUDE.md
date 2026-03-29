@@ -23,7 +23,7 @@ The JSON output tells you:
 - `fixes[]` — rules that would auto-fix (these run automatically on commit)
 - `flags[]` — issues to address before committing (naming, catch-rethrow patterns)
 
-Exit codes: 0 = clean, 1 = flags found (address these), 2 = fixes will be applied (auto-handled)
+Exit codes: 0 = clean or fixes applied (success), 1 = flags found (needs attention)
 
 ## When writing code
 

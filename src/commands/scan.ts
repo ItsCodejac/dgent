@@ -94,13 +94,16 @@ export function registerScan(program: Command): void {
       let totalFixes = 0;
       let totalFlags = 0;
       let cleanFiles = 0;
+      let filesProcessed = 0;
 
-      for (const file of files) {
+      const CONCURRENCY = 10;
+
+      async function processFile(file: string): Promise<{ result: FileScanResult | null; modified: string | null; original: string | null }> {
         let content: string;
         try {
           content = readFileSync(file, "utf-8");
         } catch {
-          continue;
+          return { result: null, modified: null, original: null };
         }
 
         let modified = content;
@@ -121,28 +124,51 @@ export function registerScan(program: Command): void {
         }
 
         if (fileFixes.length === 0 && fileFlags.length === 0) {
-          cleanFiles++;
-          continue;
+          return { result: null, modified: null, original: null };
         }
 
-        totalFixes += fileFixes.length;
-        totalFlags += fileFlags.length;
+        return {
+          result: { file: relative(process.cwd(), file) || file, fixes: fileFixes, flags: fileFlags },
+          modified,
+          original: content,
+        };
+      }
 
-        results.push({ file: relative(process.cwd(), file) || file, fixes: fileFixes, flags: fileFlags });
+      // Process files in parallel batches of CONCURRENCY
+      for (let i = 0; i < files.length; i += CONCURRENCY) {
+        const batch = files.slice(i, i + CONCURRENCY);
+        const batchResults = await Promise.all(batch.map((file) => processFile(file)));
 
-        if (!options.json) {
-          const relPath = relative(process.cwd(), file) || file;
-          console.error(`  ${yellow("▸")} ${relPath}`);
-          for (const fix of fileFixes) {
-            console.error(`    ${green("■")} ${cyan(fix)} ${dim("would fix")}`);
-          }
-          for (const flag of fileFlags) {
-            console.error(`    ${yellow("■")} ${dim(`[${flag.rule}]`)} ${dim("line")} ${flag.line}: ${flag.message}`);
+        for (let j = 0; j < batchResults.length; j++) {
+          const { result: fileResult, modified, original } = batchResults[j];
+
+          if (!fileResult) {
+            cleanFiles++;
+          } else {
+            totalFixes += fileResult.fixes.length;
+            totalFlags += fileResult.flags.length;
+            results.push(fileResult);
+
+            if (!options.json) {
+              console.error(`  ${yellow("▸")} ${fileResult.file}`);
+              for (const fix of fileResult.fixes) {
+                console.error(`    ${green("■")} ${cyan(fix)} ${dim("would fix")}`);
+              }
+              for (const flag of fileResult.flags) {
+                console.error(`    ${yellow("■")} ${dim(`[${flag.rule}]`)} ${dim("line")} ${flag.line}: ${flag.message}`);
+              }
+            }
+
+            if (options.fix && modified && original && modified !== original) {
+              writeFileSync(files[i + j], modified, "utf-8");
+            }
           }
         }
 
-        if (options.fix && modified !== content) {
-          writeFileSync(file, modified, "utf-8");
+        const prevProcessed = filesProcessed;
+        filesProcessed += batch.length;
+        if (!options.json && Math.floor(filesProcessed / 50) > Math.floor(prevProcessed / 50)) {
+          process.stderr.write(`  ${dim(`${filesProcessed}/${files.length} files processed...`)}\n`);
         }
       }
 
@@ -159,7 +185,7 @@ export function registerScan(program: Command): void {
             flags: r.flags.map((f) => ({ rule: f.rule, line: f.line, message: f.message })),
           })),
         }, null, 2));
-        process.exit(totalFlags > 0 ? 1 : totalFixes > 0 ? 2 : 0);
+        process.exit(totalFlags > 0 ? 1 : 0);
         return;
       }
 

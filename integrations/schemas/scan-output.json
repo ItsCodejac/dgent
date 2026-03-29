@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dgent.dev/schemas/scan-output.json",
+  "title": "dgent scan --json output",
+  "description": "JSON output produced by `dgent scan --json [dir]`. Exit codes: 0 = clean, 1 = flags found, 2 = fixes found.",
+  "type": "object",
+  "required": ["files", "clean", "filesWithIssues", "totalFixes", "totalFlags", "results"],
+  "additionalProperties": false,
+  "properties": {
+    "files": {
+      "type": "number",
+      "description": "Total number of code files scanned."
+    },
+    "clean": {
+      "type": "number",
+      "description": "Number of files with no issues."
+    },
+    "filesWithIssues": {
+      "type": "number",
+      "description": "Number of files that had at least one fix or flag."
+    },
+    "totalFixes": {
+      "type": "number",
+      "description": "Total number of fixable rule matches across all files."
+    },
+    "totalFlags": {
+      "type": "number",
+      "description": "Total number of flag rule matches across all files."
+    },
+    "results": {
+      "type": "array",
+      "description": "Per-file results. Only files with issues are included.",
+      "items": {
+        "type": "object",
+        "required": ["file", "fixes", "flags"],
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Relative path to the file."
+          },
+          "fixes": {
+            "type": "array",
+            "description": "Names of rules that would fix this file.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "flags": {
+            "type": "array",
+            "description": "Warnings raised for this file.",
+            "items": {
+              "type": "object",
+              "required": ["rule", "line", "message"],
+              "additionalProperties": false,
+              "properties": {
+                "rule": {
+                  "type": "string",
+                  "description": "Name of the rule that raised the flag."
+                },
+                "line": {
+                  "type": "number",
+                  "description": "1-based line number where the issue was found."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable description of the issue."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

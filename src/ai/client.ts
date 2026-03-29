@@ -32,10 +32,21 @@ export async function callSkill<T>(
     });
 
     return message.parsed_output as T;
-  } catch (err) {
-    console.error(
-      `dgent: AI skill error (${err instanceof Error ? err.message : String(err)})`,
-    );
+  } catch (err: unknown) {
+    if (err instanceof Error && "status" in err) {
+      const status = (err as { status: number }).status;
+      if (status === 401) {
+        console.error("dgent: invalid API key. Check your key with: dgent config set api-key <key>");
+      } else if (status === 429) {
+        console.error("dgent: rate limited by the API. Wait a moment and try again.");
+      } else {
+        console.error(`dgent: AI API error (HTTP ${status}): ${err.message}`);
+      }
+    } else if (err instanceof TypeError || (err instanceof Error && /fetch|network|ECONNREFUSED|ENOTFOUND|ETIMEDOUT/i.test(err.message))) {
+      console.error("dgent: network error — could not reach the Anthropic API. Check your connection.");
+    } else {
+      console.error(`dgent: AI skill error (${err instanceof Error ? err.message : String(err)})`);
+    }
     return null;
   }
 }

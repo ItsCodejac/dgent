@@ -26,7 +26,7 @@ export function registerRun(program: Command): void {
     .option("--commit-msg", "Run commit message rules only")
     .option("--pre-commit", "Run pre-commit (code) rules only")
     .option("--json", "Output results as JSON (for agent/CI consumption)")
-    .option("--check", "Exit 0 if clean, 1 if flags, 2 if fixes — no output")
+    .option("--check", "Exit 0 if clean or fixes applied, 1 if flags — no output")
     .action(async (file: string | undefined, options: { dryRun?: boolean; fix?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean; check?: boolean }, command: Command) => {
       let input: string;
 
@@ -134,7 +134,7 @@ export function registerRun(program: Command): void {
       }
 
       if (options.check) {
-        process.exit(flagResults.length > 0 ? 1 : fixResults.length > 0 ? 2 : 0);
+        process.exit(flagResults.length > 0 ? 1 : 0);
         return;
       }
 
@@ -155,7 +155,7 @@ export function registerRun(program: Command): void {
           jsonResult.output = output;
         }
         console.log(JSON.stringify(jsonResult, null, 2));
-        process.exit(flagResults.length > 0 ? 1 : fixResults.length > 0 ? 2 : 0);
+        process.exit(flagResults.length > 0 ? 1 : 0);
         return;
       }
 
@@ -177,8 +177,7 @@ export function registerRun(program: Command): void {
         console.error(`  ${dim("dry-run — changes not applied")}`);
       }
 
-      // Exit codes: 0 = clean, 1 = flags found, 2 = fixes applied
+      // Exit codes: 0 = clean or fixes applied, 1 = flags found
       if (flagResults.length > 0) process.exit(1);
-      if (fixResults.length > 0) process.exit(2);
     });
 }
