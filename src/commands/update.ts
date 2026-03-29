@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { VERSION, printCompact } from "../ui/brand.js";
 import { dim, green, yellow, cyan } from "../ui/colors.js";
 
+// dgent-ignore flag-naming
 function detectPackageManager(): { name: string; cmd: string } {
   // Check npm_config_user_agent first (set by npm/pnpm/yarn/bun when running scripts)
   const userAgent = process.env.npm_config_user_agent ?? "";
