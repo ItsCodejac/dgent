@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { readFileSync, writeFileSync } from "node:fs";
+import { extname } from "node:path";
 import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
 import type { Rule, Flag } from "../rules/index.js";
@@ -43,6 +44,27 @@ export function registerRun(program: Command): void {
             console.error(`Cannot read ${file}: ${err instanceof Error ? err.message : String(err)}`);
           }
           process.exit(1);
+        }
+      }
+
+      // Skip binary files
+      if (file && file !== "-") {
+        const binaryExts = new Set([
+          ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".svg",
+          ".woff", ".woff2", ".ttf", ".eot", ".otf",
+          ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar", ".tgz",
+          ".pdf", ".doc", ".docx", ".xls", ".xlsx",
+          ".exe", ".dll", ".so", ".dylib", ".o",
+          ".mp3", ".mp4", ".wav", ".avi", ".mov",
+          ".pyc", ".class", ".wasm",
+        ]);
+        if (binaryExts.has(extname(file).toLowerCase())) {
+          if (options.json) {
+            console.log(JSON.stringify({ file, phase: "skipped", clean: true, fixes: [], flags: [] }));
+          } else {
+            printCompact(`${dim(file)} ${dim("· binary, skipped")}`);
+          }
+          return;
         }
       }
 
