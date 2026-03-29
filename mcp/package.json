@@ -1,0 +1,39 @@
+{
+  "name": "dgent-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for dgent — de-agent your code via Model Context Protocol",
+  "type": "module",
+  "bin": {
+    "dgent-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && chmod 755 dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "os": ["darwin", "linux"],
+  "author": "Cojac <cojacproduction@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "dgent",
+    "ai",
+    "agent",
+    "git",
+    "hooks",
+    "code-quality"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.0",
+    "typescript": "^6.0.0"
+  }
+}
