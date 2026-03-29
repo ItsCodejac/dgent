@@ -123,10 +123,44 @@ export function printInitConflict(existingPath: string): void {
   console.error(`  ${red("Conflict:")} ${dim("core.hooksPath already set")}`);
   console.error(`  ${dim("→")} ${yellow(existingPath)}`);
   console.error("");
-  console.error(`  ${dim("To use dgent alongside existing hooks, add to your hook scripts:")}`);
-  console.error("");
-  console.error(`  ${cyan('dgent hook commit-msg "$@" || true')}`);
-  console.error(`  ${cyan('dgent hook pre-commit "$@" || true')}`);
+
+  const lowerPath = existingPath.toLowerCase();
+  const chainLine = 'dgent hook commit-msg "$@" || true';
+  const chainLinePre = 'dgent hook pre-commit "$@" || true';
+
+  if (lowerPath.includes("husky")) {
+    console.error(`  ${dim("Detected:")} ${bold(white("husky"))}`);
+    console.error(`  ${dim("Add to your husky hook files:")}`);
+    console.error("");
+    console.error(`  ${dim("File:")} ${cyan(`${existingPath}/commit-msg`)}`);
+    console.error(`  ${cyan(chainLine)}`);
+    console.error("");
+    console.error(`  ${dim("File:")} ${cyan(`${existingPath}/pre-commit`)}`);
+    console.error(`  ${cyan(chainLinePre)}`);
+  } else if (lowerPath.includes("lefthook")) {
+    console.error(`  ${dim("Detected:")} ${bold(white("lefthook"))}`);
+    console.error(`  ${dim("Add dgent as a command in your lefthook config:")}`);
+    console.error("");
+    console.error(`  ${dim("File:")} ${cyan("lefthook.yml")}`);
+    console.error(`  ${dim("Under commit-msg/pre-commit hooks, add:")}`);
+    console.error(`  ${cyan(chainLine)}`);
+    console.error(`  ${cyan(chainLinePre)}`);
+  } else if (lowerPath.includes(".git/hooks")) {
+    console.error(`  ${dim("Detected:")} ${bold(white("custom git hooks"))}`);
+    console.error(`  ${dim("Add to your hook scripts:")}`);
+    console.error("");
+    console.error(`  ${dim("File:")} ${cyan(`${existingPath}/commit-msg`)}`);
+    console.error(`  ${cyan(chainLine)}`);
+    console.error("");
+    console.error(`  ${dim("File:")} ${cyan(`${existingPath}/pre-commit`)}`);
+    console.error(`  ${cyan(chainLinePre)}`);
+  } else {
+    console.error(`  ${dim("To use dgent alongside existing hooks, add to your hook scripts:")}`);
+    console.error("");
+    console.error(`  ${cyan(chainLine)}`);
+    console.error(`  ${cyan(chainLinePre)}`);
+  }
+
   console.error("");
 }
 

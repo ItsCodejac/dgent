@@ -1,10 +1,11 @@
-import { existsSync, mkdirSync, writeFileSync, readFileSync, rmSync, chmodSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, chmodSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { printInitSuccess, printInitConflict, printUninstallSuccess, printSuccess, printWarning, printInfo } from "../ui/brand.js";
 import { dim, cyan, yellow } from "../ui/colors.js";
+import { deleteApiKey } from "../config/secrets.js";
 
 const HOOKS_DIR = join(homedir(), ".config", "dgent", "hooks");
 const MARKER_FILE = join(HOOKS_DIR, ".dgent");
@@ -173,26 +174,98 @@ function checkGitIdentity(): void {
   }
 }
 
-export function uninstallHooks(): void {
+export function uninstallHooks(options: { keepConfig?: boolean } = {}): void {
   const current = getCurrentHooksPath();
+  const removed: string[] = [];
 
   if (!current) {
-    printInfo("dgent hooks not installed.");
-    return;
-  }
-
-  if (!isOwnedByDgent(current)) {
+    printInfo("dgent hooks not installed (no core.hooksPath).");
+  } else if (!isOwnedByDgent(current)) {
     printInfo(`core.hooksPath set to ${current} — not managed by dgent.`);
-    return;
+  } else {
+    try {
+      rmSync(HOOKS_DIR, { recursive: true, force: true });
+      removed.push(`hooks: ${HOOKS_DIR}`);
+    } catch { /* best effort */ }
+
+    try {
+      execFileSync("git", ["config", "--global", "--unset", "core.hooksPath"]);
+      removed.push("git config: core.hooksPath unset");
+    } catch { /* may already be unset */ }
   }
 
+  // Clean up ~/.config/dgent/
+  const configDir = join(homedir(), ".config", "dgent");
+  if (existsSync(configDir)) {
+    if (options.keepConfig) {
+      // Remove everything except config.json
+      const configJsonPath = join(configDir, "config.json");
+      try {
+        const entries = readDirEntries(configDir);
+        for (const entry of entries) {
+          const entryPath = join(configDir, entry);
+          if (entryPath === configJsonPath) continue;
+          try {
+            rmSync(entryPath, { recursive: true, force: true });
+          } catch { /* best effort */ }
+        }
+        removed.push(`config dir: ${configDir} (kept config.json)`);
+      } catch { /* best effort */ }
+    } else {
+      try {
+        rmSync(configDir, { recursive: true, force: true });
+        removed.push(`config dir: ${configDir}`);
+      } catch { /* best effort */ }
+    }
+  }
+
+  // Clean up ~/.local/share/dgent/ (logs)
+  const dataDir = join(homedir(), ".local", "share", "dgent");
+  if (existsSync(dataDir)) {
+    try {
+      rmSync(dataDir, { recursive: true, force: true });
+      removed.push(`data dir: ${dataDir}`);
+    } catch { /* best effort */ }
+  }
+
+  // Delete macOS Keychain / Linux key file
   try {
-    rmSync(HOOKS_DIR, { recursive: true, force: true });
+    deleteApiKey();
+    removed.push("api key: keychain/key file entry");
   } catch { /* best effort */ }
 
-  try {
-    execFileSync("git", ["config", "--global", "--unset", "core.hooksPath"]);
-  } catch { /* may already be unset */ }
+  // Clean up Claude Code skills
+  const claudeSkillsDir = join(homedir(), ".claude", "skills", "dgent");
+  if (existsSync(claudeSkillsDir)) {
+    try {
+      rmSync(claudeSkillsDir, { recursive: true, force: true });
+      removed.push(`claude skills: ${claudeSkillsDir}`);
+    } catch { /* best effort */ }
+  }
 
-  printUninstallSuccess();
+  // Clean up OpenClaw skills
+  const openclawSkillsDir = join(homedir(), ".openclaw", "workspace", "skills", "dgent");
+  if (existsSync(openclawSkillsDir)) {
+    try {
+      rmSync(openclawSkillsDir, { recursive: true, force: true });
+      removed.push(`openclaw skills: ${openclawSkillsDir}`);
+    } catch { /* best effort */ }
+  }
+
+  if (removed.length === 0) {
+    printInfo("Nothing to remove.");
+  } else {
+    printUninstallSuccess();
+    for (const item of removed) {
+      printInfo(`removed ${item}`);
+    }
+  }
+}
+
+function readDirEntries(dir: string): string[] {
+  try {
+    return readdirSync(dir);
+  } catch {
+    return [];
+  }
 }

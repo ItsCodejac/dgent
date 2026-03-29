@@ -13,7 +13,7 @@ import { BINARY_EXTENSIONS, CODE_EXTENSIONS } from "../utils/extensions.js";
 
 interface FileScanResult {
   file: string;
-  fixes: string[];
+  fixes: Array<{ rule: string }>;
   flags: Flag[];
 }
 
@@ -91,7 +91,7 @@ export function registerScan(program: Command): void {
         }
 
         let modified = content;
-        const fileFixes: string[] = [];
+        const fileFixes: Array<{ rule: string }> = [];
         const fileFlags: Flag[] = [];
         const ignoreMap = parseIgnoreComments(content);
 
@@ -99,7 +99,7 @@ export function registerScan(program: Command): void {
           const result = await rule.apply(modified);
           if (result.changed) {
             modified = result.output;
-            fileFixes.push(rule.name);
+            fileFixes.push({ rule: rule.name });
           }
           if (result.flags.length > 0) {
             const filtered = filterIgnoredFlags(result.flags, ignoreMap);
@@ -136,7 +136,7 @@ export function registerScan(program: Command): void {
             if (!options.json) {
               console.error(`  ${yellow("▸")} ${fileResult.file}`);
               for (const fix of fileResult.fixes) {
-                console.error(`    ${green("■")} ${cyan(fix)} ${dim("would fix")}`);
+                console.error(`    ${green("■")} ${cyan(fix.rule)} ${dim("would fix")}`);
               }
               for (const flag of fileResult.flags) {
                 console.error(`    ${yellow("■")} ${dim(`[${flag.rule}]`)} ${dim("line")} ${flag.line}: ${flag.message}`);

@@ -95,6 +95,15 @@ export function loadConfig(): DgentConfig {
   // Apply per-repo overrides
   const overrides = loadRepoOverrides();
 
+  // Warn about unknown keys in .dgent.json
+  if (overrides) {
+    const ALLOWED_KEYS = new Set(["rules", "disabled"]);
+    const unknownKeys = Object.keys(overrides).filter((k) => !ALLOWED_KEYS.has(k));
+    if (unknownKeys.length > 0) {
+      console.error(`dgent: .dgent.json keys ignored (not overridable): ${unknownKeys.join(", ")}`);
+    }
+  }
+
   // Check for per-repo disable
   if (overrides && (overrides as Record<string, unknown>).disabled === true) {
     config.disabled = true;
