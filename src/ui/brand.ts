@@ -4,9 +4,7 @@ import type { Flag } from "../rules/index.js";
 const VERSION = "0.1.0";
 
 const LOGO = `
-  ${dim("┌─────────────────────────┐")}
-  ${dim("│")}  ${bold(white("d"))}${cyan("gent")}  ${dim("·")} ${gray("strip the tells")} ${dim("│")}
-  ${dim("└─────────────────────────┘")}`;
+  ${bold(white("d"))}${cyan("gent")} ${dim("· strip the tells")}`;
 
 const LOGO_COMPACT = `${bold(white("d"))}${cyan("gent")}`;
 
