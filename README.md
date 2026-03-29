@@ -114,6 +114,34 @@ The AI layer is entirely optional. Without it, dgent runs purely deterministic r
 - Use `DGENT_DRY_RUN=1 git commit -m "..."` to preview changes without applying.
 - Use `dgent run --dry-run <file>` to test rules on any file.
 
+## Agent integrations
+
+dgent works with AI coding agents — not just on their output, but as a tool they can use.
+
+### Claude Code / Codex
+
+```sh
+dgent integrate
+```
+
+This installs skills to `~/.claude/skills/dgent/` and prints instructions for adding dgent context to your `CLAUDE.md`. After setup, the agent can:
+
+- Run `dgent run --json <file>` to check files for tells before committing
+- Understand which patterns to avoid (naming, catch-rethrow, etc.)
+- Configure rules per-repo via `.dgent.json`
+
+### JSON output for CI/agents
+
+```sh
+dgent run --json src/file.ts
+```
+
+Returns structured JSON with fixes, flags, and cleaned output. Exit codes: `0` = clean, `1` = flags found, `2` = fixes applied.
+
+### LLM-readable docs
+
+The package ships with `llms.txt` — a single-file reference any agent can consume for full rule documentation, config options, and troubleshooting.
+
 ## How it works
 
 dgent installs into `git config --global core.hooksPath`. Two thin shell scripts call `dgent hook commit-msg` and `dgent hook pre-commit`, both with `|| true` so they never block.

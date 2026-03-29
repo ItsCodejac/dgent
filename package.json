@@ -11,6 +11,7 @@
     "dist/",
     "src/ai/skill.md",
     "test/fixtures/",
+    "integrations/",
     "llms.txt"
   ],
   "scripts": {

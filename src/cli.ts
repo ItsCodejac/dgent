@@ -10,6 +10,7 @@ import { registerLog } from "./commands/log.js";
 import { registerTest } from "./commands/test.js";
 import { registerUpdate } from "./commands/update.js";
 import { registerHook } from "./commands/hook.js";
+import { registerIntegrate } from "./commands/integrate.js";
 import { getBanner, VERSION } from "./ui/brand.js";
 
 const program = new Command();
@@ -30,6 +31,7 @@ registerConfig(program);
 registerLog(program);
 registerTest(program);
 registerUpdate(program);
+registerIntegrate(program);
 registerHook(program);
 
 program.parse();

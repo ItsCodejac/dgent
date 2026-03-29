@@ -2,9 +2,18 @@ import type { Command } from "commander";
 import { readFileSync } from "node:fs";
 import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
-import type { Rule } from "../rules/index.js";
+import type { Rule, Flag } from "../rules/index.js";
 import { printCompact, printRuleResult, printFlag } from "../ui/brand.js";
-import { dim, green, cyan } from "../ui/colors.js";
+import { dim, green } from "../ui/colors.js";
+
+interface JsonResult {
+  file: string | null;
+  phase: string;
+  clean: boolean;
+  fixes: Array<{ rule: string }>;
+  flags: Array<{ rule: string; line: number; message: string; suggestion?: string }>;
+  output?: string;
+}
 
 export function registerRun(program: Command): void {
   program
@@ -13,7 +22,8 @@ export function registerRun(program: Command): void {
     .option("--dry-run", "Preview changes without applying")
     .option("--commit-msg", "Run commit message rules only")
     .option("--pre-commit", "Run pre-commit (code) rules only")
-    .action(async (file: string | undefined, options: { dryRun?: boolean; commitMsg?: boolean; preCommit?: boolean }) => {
+    .option("--json", "Output results as JSON (for agent/CI consumption)")
+    .action(async (file: string | undefined, options: { dryRun?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean }) => {
       let input: string;
 
       if (file === "-" || !file) {
@@ -26,17 +36,19 @@ export function registerRun(program: Command): void {
         try {
           input = readFileSync(file, "utf-8");
         } catch (err) {
-          console.error(`Cannot read ${file}: ${err instanceof Error ? err.message : String(err)}`);
+          if (options.json) {
+            console.log(JSON.stringify({ error: `Cannot read ${file}` }));
+          } else {
+            console.error(`Cannot read ${file}: ${err instanceof Error ? err.message : String(err)}`);
+          }
           process.exit(1);
         }
       }
 
-      // Determine which phase to run
       let phase: "commit-msg" | "pre-commit" | "both" = "both";
       if (options.commitMsg) phase = "commit-msg";
       if (options.preCommit) phase = "pre-commit";
 
-      // Auto-detect: if no flag specified and file has a code extension, run pre-commit only
       if (phase === "both" && file && file !== "-") {
         const codeExtensions = [".ts", ".js", ".tsx", ".jsx", ".py", ".go", ".rs", ".java", ".c", ".cpp", ".rb", ".swift"];
         if (codeExtensions.some((ext) => file.endsWith(ext))) {
@@ -46,39 +58,61 @@ export function registerRun(program: Command): void {
 
       const config = loadConfig();
       let output = input;
-      let totalFlags = 0;
-      let totalFixes = 0;
-
-      const phaseLabel = phase === "both" ? "all rules" : `${phase} rules`;
-      printCompact(`${dim(file ?? "stdin")} ${dim("·")} ${dim(phaseLabel)}`);
-      console.error("");
+      const fixResults: Array<{ rule: string }> = [];
+      const flagResults: Flag[] = [];
 
       const targetRules: Rule[] = rules.filter((r) => {
         if (phase !== "both" && r.phase !== phase) return false;
         return config.rules[r.name] ?? r.defaultEnabled;
       });
 
+      if (!options.json) {
+        const phaseLabel = phase === "both" ? "all rules" : `${phase} rules`;
+        printCompact(`${dim(file ?? "stdin")} ${dim("·")} ${dim(phaseLabel)}`);
+        console.error("");
+      }
+
       for (const rule of targetRules) {
         const result = await rule.apply(output);
 
         if (result.changed) {
           output = result.output;
-          totalFixes++;
-          printRuleResult(rule.name, "fixed");
+          fixResults.push({ rule: rule.name });
+          if (!options.json) printRuleResult(rule.name, "fixed");
         } else if (result.flags.length > 0) {
-          printRuleResult(rule.name, "flagged");
+          if (!options.json) printRuleResult(rule.name, "flagged");
         }
 
         for (const flag of result.flags) {
-          printFlag({ ...flag, file });
-          totalFlags++;
+          flagResults.push(flag);
+          if (!options.json) printFlag({ ...flag, file });
         }
       }
 
-      if (totalFixes === 0 && totalFlags === 0) {
-        console.error(`  ${green("✓")} ${dim("clean")}`);
+      if (options.json) {
+        const jsonResult: JsonResult = {
+          file: file ?? null,
+          phase,
+          clean: fixResults.length === 0 && flagResults.length === 0,
+          fixes: fixResults,
+          flags: flagResults.map((f) => ({
+            rule: f.rule,
+            line: f.line,
+            message: f.message,
+            suggestion: f.suggestion,
+          })),
+        };
+        if (output !== input) {
+          jsonResult.output = output;
+        }
+        console.log(JSON.stringify(jsonResult, null, 2));
+        process.exit(flagResults.length > 0 ? 1 : fixResults.length > 0 ? 2 : 0);
+        return;
       }
 
+      if (fixResults.length === 0 && flagResults.length === 0) {
+        console.error(`  ${green("✓")} ${dim("clean")}`);
+      }
       console.error("");
 
       if (output !== input && !options.dryRun) {
@@ -86,5 +120,9 @@ export function registerRun(program: Command): void {
       } else if (options.dryRun && output !== input) {
         console.error(`  ${dim("dry-run — changes not applied")}`);
       }
+
+      // Exit codes: 0 = clean, 1 = flags found, 2 = fixes applied
+      if (flagResults.length > 0) process.exit(1);
+      if (fixResults.length > 0) process.exit(2);
     });
 }
