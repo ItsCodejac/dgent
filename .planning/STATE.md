@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 5 of 6 (AI Skill Layer)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-28 — Phase 4 complete
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-03-28 — 05-01 complete (API key storage + SDK client)
 
-Progress: ██████░░░░ 9/14 plans (64%)
+Progress: ███████░░░ 10/14 plans (71%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: —
 - Total execution time: —
 
@@ -31,6 +31,7 @@ Progress: ██████░░░░ 9/14 plans (64%)
 | 2. Message Rules | 2/2 | — | — |
 | 3. Hook Lifecycle | 1/1 | — | — |
 | 4. Diff Transforms | 3/3 | — | — |
+| 5. AI Skill Layer | 1/3 | — | — |
 
 ## Accumulated Context
 
@@ -38,10 +39,9 @@ Progress: ██████░░░░ 9/14 plans (64%)
 
 - npm global install over Bun compile + Homebrew
 - ESM with Node16 module resolution
-- Hooks dir at ~/.config/dgent/hooks with .dgent marker
-- Fixture pairs with .flags.json for flag rule testing
-- Flag-catch-rethrow: only flag bare rethrow (throw e), not wrapped errors (throw new AppError)
-- Consent file at ~/.config/dgent/consent, auto-skip in non-interactive
+- macOS keychain via security CLI for API key, Linux plain file with 600 perms
+- ANTHROPIC_API_KEY env var takes precedence over stored key
+- jsonSchemaOutputFormat with any cast for flexible schema types
 
 ### Deferred Issues
 
@@ -54,5 +54,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Phase 4 complete. All 8 rules implemented with 36/36 fixtures passing.
+Stopped at: 05-01 complete. API key storage + Anthropic SDK client ready. 36/36 fixtures pass.
 Resume file: None
