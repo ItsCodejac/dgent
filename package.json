@@ -1,15 +1,21 @@
 {
   "name": "dgent",
   "version": "0.1.0",
-  "description": "Strip AI tells from agent output",
+  "description": "Strip AI tells from agent output — commit trailers, noise comments, emoji, AI vocabulary, and more",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
     "dgent": "./dist/cli.js"
   },
+  "files": [
+    "dist/",
+    "src/ai/skill.md",
+    "test/fixtures/"
+  ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
   },
   "engines": {
     "node": ">=18"
@@ -19,9 +25,19 @@
     "hooks",
     "ai",
     "agent",
-    "cli"
+    "cli",
+    "commit",
+    "code-quality",
+    "developer-tools",
+    "linter",
+    "copilot",
+    "claude"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cojac/dgent"
+  },
   "devDependencies": {
     "@types/node": "^25.5.0",
     "typescript": "^6.0.2"

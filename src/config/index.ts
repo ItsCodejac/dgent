@@ -1,6 +1,7 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
+import { execSync } from "node:child_process";
 import { DEFAULT_CONFIG } from "./defaults.js";
 
 export interface DgentConfig {
@@ -41,25 +42,64 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
   return result;
 }
 
+function getRepoRoot(): string | null {
+  try {
+    return execSync("git rev-parse --show-toplevel", {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function loadRepoOverrides(): Partial<DgentConfig> | null {
+  const root = getRepoRoot();
+  if (!root) return null;
+
+  const overridePath = join(root, ".dgent.json");
+  if (!existsSync(overridePath)) return null;
+
+  try {
+    const raw = readFileSync(overridePath, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 export function loadConfig(): DgentConfig {
   const configPath = getConfigPath();
+  let config: DgentConfig;
+
   try {
     const raw = readFileSync(configPath, "utf-8");
     const parsed = JSON.parse(raw);
-    return deepMerge(
+    config = deepMerge(
       DEFAULT_CONFIG as unknown as Record<string, unknown>,
       parsed,
     ) as unknown as DgentConfig;
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-      return { ...DEFAULT_CONFIG };
-    }
-    if (err instanceof SyntaxError) {
+      config = { ...DEFAULT_CONFIG };
+    } else if (err instanceof SyntaxError) {
       console.warn(`Warning: invalid JSON in ${configPath}, using defaults`);
-      return { ...DEFAULT_CONFIG };
+      config = { ...DEFAULT_CONFIG };
+    } else {
+      throw err;
     }
-    throw err;
   }
+
+  // Apply per-repo overrides (only rules section)
+  const overrides = loadRepoOverrides();
+  if (overrides?.rules) {
+    config = {
+      ...config,
+      rules: { ...config.rules, ...overrides.rules },
+    };
+  }
+
+  return config;
 }
 
 export function saveConfig(config: DgentConfig): void {
