@@ -15,6 +15,10 @@ export function printBanner(): void {
   console.error(`  ${dim(`v${VERSION}`)}\n`);
 }
 
+export function getBanner(): string {
+  return `${LOGO}\n  ${dim(`v${VERSION}`)}\n`;
+}
+
 export function printVersion(): void {
   console.log(`dgent v${VERSION}`);
 }

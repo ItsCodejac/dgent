@@ -44,8 +44,10 @@ export const normalizeFormat: Rule = {
       description = description.slice(0, -1);
     }
 
-    // Lowercase first character of description
-    if (description.length > 0 && /^[A-Z]/.test(description)) {
+    // Lowercase first character of description — but skip acronyms (e.g., "URL", "API")
+    const firstWord = description.split(/\s/)[0];
+    const isAcronym = firstWord && firstWord === firstWord.toUpperCase() && firstWord.length >= 2;
+    if (description.length > 0 && /^[A-Z]/.test(description) && !isAcronym) {
       description = description[0].toLowerCase() + description.slice(1);
     }
 
