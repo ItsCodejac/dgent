@@ -1,9 +1,5 @@
-// --- Initialization ---
-
-// ✅ Initialize the configuration handler
+// Initialize the configuration handler
 const configHandler = new ConfigurationHandler();
-
-// --- Main Logic ---
 
 class DataProcessor {
   process(data: string) {
@@ -17,3 +13,5 @@ try {
   console.error(e);
   throw e;
 }
+
+export default DataProcessor;
