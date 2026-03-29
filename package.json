@@ -23,7 +23,10 @@
   "publishConfig": {
     "provenance": true
   },
-  "os": ["darwin", "linux"],
+  "os": [
+    "darwin",
+    "linux"
+  ],
   "engines": {
     "node": ">=18"
   },
@@ -71,6 +74,7 @@
   },
   "optionalDependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
+    "@inkjs/ui": "^2.0.0",
     "ink": "^6.8.0",
     "ink-select-input": "^6.2.0",
     "react": "^19.2.4"
