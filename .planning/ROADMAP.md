@@ -16,7 +16,7 @@ None
 
 - [x] **Phase 1: Foundation** — npm package scaffold, commander CLI skeleton, config system
 - [x] **Phase 2: Message Rules** — commit-msg rule implementations with fixture-based testing
-- [ ] **Phase 3: Hook Lifecycle** — dgent init/uninstall, conflict detection, hook scripts, --dry-run
+- [x] **Phase 3: Hook Lifecycle** — dgent init/uninstall, conflict detection, hook scripts, --dry-run
 - [ ] **Phase 4: Diff Transforms** — pre-commit hook with partial staging, consent flow, all default-on diff rules
 - [ ] **Phase 5: AI Skill Layer** — Anthropic SDK, secure key storage, skill.md, rewrite-message, opt-in rules
 - [ ] **Phase 6: TUI + Polish** — Ink TUI for review/config, dgent run/log, per-repo overrides, self-update
@@ -96,7 +96,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-03-28 |
 | 2. Message Rules | 2/2 | Complete | 2026-03-28 |
-| 3. Hook Lifecycle | 0/2 | Not started | - |
+| 3. Hook Lifecycle | 1/1 | Complete | 2026-03-28 |
 | 4. Diff Transforms | 0/3 | Not started | - |
 | 5. AI Skill Layer | 0/3 | Not started | - |
 | 6. TUI + Polish | 0/3 | Not started | - |
