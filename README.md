@@ -10,7 +10,7 @@ Your code just needs to be de-agented. dgent runs automatically via git hooks â€
 
 > **Alpha (v0.1.0)** â€” Actively developed. Core rules and hooks are stable. AI features, TUI, and some opt-in rules are still being refined. [Report issues](https://github.com/ItsCodejac/dgent/issues).
 >
-> **Platforms:** macOS, Linux. Windows is not supported.
+> **Platforms:** macOS, Linux, Windows (requires [Git for Windows](https://gitforwindows.org/)).
 
 ## The problem
 

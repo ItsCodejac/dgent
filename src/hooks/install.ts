@@ -53,10 +53,13 @@ function isOwnedByDgent(hooksPath: string): boolean {
 }
 
 function getDgentPath(): string {
+  const cmd = process.platform === "win32" ? "where" : "which";
   try {
-    return execFileSync("which", ["dgent"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    const result = execFileSync(cmd, ["dgent"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    // `where` on Windows can return multiple lines — take the first
+    return result.split("\n")[0].trim();
   } catch {
-    return "dgent"; // Fallback to PATH lookup
+    return "dgent";
   }
 }
 

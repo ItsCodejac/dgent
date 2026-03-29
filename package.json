@@ -1,6 +1,6 @@
 {
   "name": "@itscojac/dgent",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "De-agent your code — clean AI tells from commits and code automatically via git hooks",
   "type": "module",
   "main": "./dist/index.js",
@@ -23,10 +23,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "os": [
-    "darwin",
-    "linux"
-  ],
   "engines": {
     "node": ">=18"
   },

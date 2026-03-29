@@ -35,13 +35,21 @@ export function registerScan(program: Command): void {
           "ls-files", "--cached", "--others", "--exclude-standard", targetDir,
         ], { encoding: "utf-8" }).trim().split("\n").filter(Boolean);
       } catch {
+        // Fallback for non-git directories
         try {
-          files = execFileSync("find", [
-            targetDir, "-type", "f",
-            "-not", "-path", "*/node_modules/*",
-            "-not", "-path", "*/.git/*",
-            "-not", "-path", "*/dist/*",
-          ], { encoding: "utf-8" }).trim().split("\n").filter(Boolean);
+          if (process.platform === "win32") {
+            // Windows: use dir /s /b
+            files = execFileSync("cmd", ["/c", "dir", "/s", "/b", targetDir], {
+              encoding: "utf-8",
+            }).trim().split("\r\n").filter(Boolean);
+          } else {
+            files = execFileSync("find", [
+              targetDir, "-type", "f",
+              "-not", "-path", "*/node_modules/*",
+              "-not", "-path", "*/.git/*",
+              "-not", "-path", "*/dist/*",
+            ], { encoding: "utf-8" }).trim().split("\n").filter(Boolean);
+          }
         } catch {
           files = [];
         }
