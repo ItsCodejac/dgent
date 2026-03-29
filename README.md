@@ -83,15 +83,20 @@ dgent installs two git hooks (`commit-msg` and `pre-commit`) that clean agent ou
 ```sh
 dgent init              # Install global git hooks
 dgent uninstall         # Remove hooks
-dgent run <file>        # Check a file for tells
+dgent scan [dir]        # Scan entire directory for tells
+dgent scan --fix        # Scan and auto-fix
+dgent run <file>        # Check a single file
 dgent run --fix <file>  # Fix a file in place
 dgent run --json <file> # Structured output for agents/CI
-dgent fix <file>        # AI-powered fix for flagged issues (requires API key)
+dgent fix <file>        # AI-powered fix for flags (requires API key)
 dgent fix --commit-msg  # AI-powered commit message cleanup
 dgent config list       # Show current config
 dgent config set <k> <v>  # Change a setting
-dgent review            # Review flags from last commit
-dgent log               # Show recent flag history
+dgent config            # Interactive config editor (TUI)
+dgent review            # Interactive flag review (TUI)
+dgent stats             # Flag trends and breakdown
+dgent log               # Raw flag history
+dgent doctor            # Check setup and common issues
 dgent integrate         # Install Claude Code skills
 dgent rage              # Print debug info for bug reports
 dgent test              # Run fixture suite
@@ -158,6 +163,31 @@ Rewrites commit messages to match your repo's historical voice (pulls last 10 me
 The API key is stored in your macOS Keychain (or `~/.local/share/dgent/.key` on Linux). You can also set `ANTHROPIC_API_KEY` as an environment variable.
 
 The AI layer is entirely optional. Without it, dgent runs purely deterministic rules with zero latency.
+
+## Inline ignores
+
+Suppress specific flags with comments:
+
+```ts
+// dgent-ignore flag-naming
+class DataProcessor { ... }           // ← not flagged
+
+class UserServiceHandler { ... }      // ← still flagged
+
+const x = getValue(); // dgent-ignore // ← ignore all rules on this line
+```
+
+Supports `// dgent-ignore`, `// dgent-ignore-next-line`, `// dgent-ignore <rule> <rule>`, and `#` for Python/shell.
+
+## CI integration
+
+Copy the workflow template to your repo:
+
+```sh
+cp node_modules/dgent/integrations/ci/dgent.yml .github/workflows/
+```
+
+Scans PR diffs for tells and posts results as a comment. Optionally make it a required check to block merge.
 
 ## Safety
 
