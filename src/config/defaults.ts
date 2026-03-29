@@ -13,7 +13,6 @@ export const DEFAULT_CONFIG: DgentConfig = {
     "strip-noise-comments": false,
     "strip-obvious-docstrings": false,
     "flag-log-bracketing": false,
-    "flag-over-defensive": false,
     "rewrite-message": false,
   },
   ai: {

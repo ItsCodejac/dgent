@@ -73,6 +73,10 @@ export function registerFix(program: Command): void {
       let input: string;
 
       if (file === "-" || !file) {
+        if (!file && process.stdin.isTTY) {
+          console.error("Usage: dgent fix <file> or pipe input via stdin");
+          process.exit(1);
+        }
         const chunks: Buffer[] = [];
         for await (const chunk of process.stdin) {
           chunks.push(chunk as Buffer);

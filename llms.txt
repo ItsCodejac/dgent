@@ -112,16 +112,24 @@ Repo overrides are merged on top of global config.
 ```
 dgent init                    # install global git hooks
 dgent uninstall               # remove hooks, unset core.hooksPath
-dgent run <file>              # manual pass on a file (auto-detects phase from extension)
+dgent scan [dir]              # scan entire directory for tells
+dgent scan --fix              # scan and auto-fix
+dgent run <file>              # check a single file (auto-detects phase from extension)
+dgent run --fix <file>        # fix in place
+dgent run --json <file>       # structured output for agents/CI
 dgent run - < file            # read from stdin
-dgent run --commit-msg <file> # force commit-msg rules
-dgent run --pre-commit <file> # force pre-commit rules
-dgent run --dry-run <file>    # preview without modifying
+dgent fix <file>              # AI-powered fix for flags (requires API key)
+dgent fix --commit-msg        # AI-powered commit message fix
+dgent config                  # interactive config editor (TUI)
 dgent config list             # show current config
 dgent config set <k> <v>     # set a config value
-dgent review                  # show flags from last commit
-dgent log                     # show recent flag history
+dgent review                  # interactive flag review (TUI)
+dgent stats                   # flag trends and breakdown
+dgent log                     # raw flag history
 dgent log --all               # show all flag history
+dgent doctor                  # check setup and common issues
+dgent integrate               # install Claude Code skills
+dgent rage                    # print debug info for bug reports
 dgent test                    # run fixture suite (development)
 dgent test --rule <name>      # run fixtures for one rule
 dgent update                  # self-update via npm
@@ -156,6 +164,40 @@ The API key is stored in macOS Keychain (via `security` CLI) or `~/.local/share/
 The AI layer uses a bundled `skill.md` as the system prompt. Override it at `~/.config/dgent/skill.md`. The model is configurable via `ai.model`.
 
 The AI layer is additive — if no API key is present, it's skipped silently. The deterministic rules always run regardless.
+
+### AI autofix
+
+With `ai.autofix` enabled, hooks automatically call Claude to resolve flags during commit:
+
+```
+dgent config set ai.autofix true
+```
+
+Renames AI identifiers, removes empty catch-rethrow, cleans AI vocabulary from messages. If the AI call fails, flags print as warnings instead (never blocks).
+
+### Manual AI fix
+
+```
+dgent fix src/file.ts              # fix flagged code
+dgent fix --commit-msg message.txt # fix flagged message
+dgent fix --dry-run src/file.ts    # preview
+```
+
+## Inline ignores
+
+Suppress specific flags with comments:
+
+```
+// dgent-ignore flag-naming
+class DataProcessor { ... }           // not flagged
+
+// dgent-ignore-next-line
+class UserServiceHandler { ... }      // not flagged
+
+const x = getValue(); // dgent-ignore // ignore all rules on this line
+```
+
+Supports `// dgent-ignore`, `// dgent-ignore-next-line`, `// dgent-ignore <rule1> <rule2>`, and `#` for Python/shell.
 
 ## Safety guarantees
 

@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { writeFileSync, mkdirSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execSync } from "node:child_process";
@@ -36,8 +36,30 @@ export function writeLog(flags: Flag[], commit?: string): void {
     };
 
     writeFileSync(join(LOG_DIR, filename), JSON.stringify(entry, null, 2) + "\n", "utf-8");
+
+    // Log rotation — keep last 1000 files, remove older
+    pruneOldLogs();
   } catch {
     // Logging failures are silent
+  }
+}
+
+const MAX_LOG_FILES = 1000;
+
+function pruneOldLogs(): void {
+  try {
+    const files = readdirSync(LOG_DIR)
+      .filter((f) => f.endsWith(".json"))
+      .sort();
+
+    if (files.length <= MAX_LOG_FILES) return;
+
+    const toRemove = files.slice(0, files.length - MAX_LOG_FILES);
+    for (const f of toRemove) {
+      try { unlinkSync(join(LOG_DIR, f)); } catch { /* best effort */ }
+    }
+  } catch {
+    // Pruning failures are silent
   }
 }
 
