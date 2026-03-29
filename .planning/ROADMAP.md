@@ -19,7 +19,7 @@ None
 - [x] **Phase 3: Hook Lifecycle** — dgent init/uninstall, conflict detection, hook scripts, --dry-run
 - [x] **Phase 4: Diff Transforms** — pre-commit hook with partial staging, consent flow, all default-on diff rules
 - [x] **Phase 5: AI Skill Layer** — Anthropic SDK, secure key storage, skill.md, rewrite-message, opt-in rules
-- [ ] **Phase 6: TUI + Polish** — Ink TUI for review/config, dgent run/log, per-repo overrides, self-update
+- [x] **Phase 6: TUI + Polish** — Ink TUI for review/config, dgent run/log, per-repo overrides, self-update
 
 ## Phase Details
 
@@ -99,4 +99,4 @@ Plans:
 | 3. Hook Lifecycle | 1/1 | Complete | 2026-03-28 |
 | 4. Diff Transforms | 3/3 | Complete | 2026-03-28 |
 | 5. AI Skill Layer | 3/3 | Complete | 2026-03-28 |
-| 6. TUI + Polish | 0/3 | Not started | - |
+| 6. TUI + Polish | 2/2 | Complete | 2026-03-28 |

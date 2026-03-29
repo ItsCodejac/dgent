@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Every agent commit that lands should look like it was written by a developer who knows the codebase, not by a tool following a template.
-**Current focus:** Phase 6 — TUI + Polish
+**Current focus:** Complete
 
 ## Current Position
 
-Phase: 6 of 6 (TUI + Polish)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-28 — Phase 5 complete
+Phase: 6 of 6 (Complete)
+Plan: All complete
+Status: Project complete
+Last activity: 2026-03-28 — All 6 phases complete
 
-Progress: █████████░ 12/14 plans (86%)
+Progress: ██████████ 14/14 plans (100%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 14
 - Average duration: —
 - Total execution time: —
 
@@ -32,6 +32,7 @@ Progress: █████████░ 12/14 plans (86%)
 | 3. Hook Lifecycle | 1/1 | — | — |
 | 4. Diff Transforms | 3/3 | — | — |
 | 5. AI Skill Layer | 3/3 | — | — |
+| 6. TUI + Polish | 2/2 | — | — |
 
 ## Accumulated Context
 
@@ -40,9 +41,9 @@ Progress: █████████░ 12/14 plans (86%)
 - npm global install over Bun compile + Homebrew
 - ESM with Node16 module resolution
 - macOS keychain via security CLI, Linux plain file with 600 perms
-- ANTHROPIC_API_KEY env var takes precedence
-- Rule interface supports async apply for AI-dependent rules
-- strip-noise-comments uses 70% word overlap threshold
+- Plain ANSI colors over Ink TUI (simpler, no dependency risk)
+- Per-repo overrides via .dgent.json (rules section only)
+- Self-update via npm update -g
 
 ### Deferred Issues
 
@@ -50,10 +51,10 @@ None.
 
 ### Blockers/Concerns
 
-- Ink compatibility with npm global install needs spike before TUI work
+None.
 
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Phase 5 complete. 12 rules implemented, 44/44 fixtures passing. AI skill layer functional.
+Stopped at: Project complete. 12 rules, 44 fixtures, branded CLI, all features implemented.
 Resume file: None
