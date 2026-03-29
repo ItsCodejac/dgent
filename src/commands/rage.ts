@@ -52,6 +52,10 @@ export function registerRage(program: Command): void {
       const lines = [
         `dgent v${VERSION}`,
         ``,
+        `## Git Identity`,
+        `user.name: ${safeExec("git config --global user.name")}`,
+        `user.email: ${safeExec("git config --global user.email")}`,
+        ``,
         `## Environment`,
         `Platform: ${platform}`,
         `Node: ${nodeVersion}`,

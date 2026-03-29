@@ -2,7 +2,8 @@ import { existsSync, mkdirSync, writeFileSync, rmSync, chmodSync } from "node:fs
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execSync } from "node:child_process";
-import { printInitSuccess, printInitConflict, printUninstallSuccess, printSuccess, printInfo } from "../ui/brand.js";
+import { printInitSuccess, printInitConflict, printUninstallSuccess, printSuccess, printWarning, printInfo } from "../ui/brand.js";
+import { dim, cyan, yellow } from "../ui/colors.js";
 
 const HOOKS_DIR = join(homedir(), ".config", "dgent", "hooks");
 const MARKER_FILE = join(HOOKS_DIR, ".dgent");
@@ -58,6 +59,46 @@ export function installHooks(): void {
   writeHookScripts();
   execSync(`git config --global core.hooksPath "${HOOKS_DIR}"`);
   printInitSuccess(HOOKS_DIR);
+
+  // Check git identity for agent-looking config
+  checkGitIdentity();
+}
+
+const AGENT_PATTERNS = [
+  "bot", "copilot", "cursor", "devin", "codex", "noreply",
+  "github-actions", "dependabot", "renovate",
+];
+
+function checkGitIdentity(): void {
+  try {
+    const name = execSync("git config --global user.name", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    const email = execSync("git config --global user.email", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+
+    const nameOrEmail = `${name} ${email}`.toLowerCase();
+    const looksLikeAgent = AGENT_PATTERNS.some((p) => nameOrEmail.includes(p));
+    const looksLikeDefault = email.endsWith(".local") || name.includes("@");
+
+    if (looksLikeAgent) {
+      console.error("");
+      printWarning(`Your git identity looks agent-generated:`);
+      console.error(`    ${dim("user.name =")} ${yellow(name)}`);
+      console.error(`    ${dim("user.email =")} ${yellow(email)}`);
+      console.error("");
+      console.error(`  ${dim("dgent cleans commit content, but not git metadata.")}`);
+      console.error(`  ${dim("Fix with:")}`);
+      console.error(`    ${cyan('git config --global user.name "Your Name"')}`);
+      console.error(`    ${cyan('git config --global user.email "you@example.com"')}`);
+      console.error("");
+    } else if (looksLikeDefault) {
+      console.error("");
+      printInfo(`Your git email looks auto-generated: ${yellow(email)}`);
+      console.error(`  ${dim("Consider setting it:")}`);
+      console.error(`    ${cyan('git config --global user.email "you@example.com"')}`);
+      console.error("");
+    }
+  } catch {
+    // No git config, not a problem
+  }
 }
 
 export function uninstallHooks(): void {
