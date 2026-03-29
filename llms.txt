@@ -37,7 +37,7 @@ Both hooks call `dgent hook <type> "$@" || true` — dgent never blocks a commit
 
 | Rule | Default | Type | Description |
 |---|---|---|---|
-| strip-section-headers | on | fix | Removes divider comments like `// --- Init ---` or `# ===== Setup =====` in files under 100 lines. |
+| strip-section-headers | on | fix | Removes divider comments like `// --- Init ---` or `# ===== Setup =====` in files under 500 lines. |
 | strip-emoji-comments | on | fix | Strips emoji from code comments and docstrings. Does not modify emoji in string literals. |
 | flag-naming | on | flag | Flags identifiers ending with Manager, Handler, Processor, Service, Factory, Builder, Validator, Controller, Orchestrator, Coordinator on declaration lines. Also flags identifiers over 40 characters. |
 | flag-catch-rethrow | on | flag | Flags catch blocks that only contain console.log/error + throw with no added context. Does not flag catches that wrap errors, add metrics, or handle the error. |
@@ -46,6 +46,30 @@ Both hooks call `dgent hook <type> "$@" || true` — dgent never blocks a commit
 | flag-log-bracketing | off | flag | Flags pairs of console.log statements within 5 lines that narrate start/end of an operation. |
 
 **Fix rules** modify code silently. **Flag rules** warn to stderr without modifying.
+
+### Complete pattern lists (for agents)
+
+**flag-message-tone words** (exact, case-insensitive): enhance, streamline, comprehensive, utilize, leverage, facilitate, robust, optimize
+
+**flag-message-tone phrases** (substring match): "this commit", "this change", "in order to", "aims to", "is designed to"
+
+**flag-message-tone subject patterns**: "Implement X to Y" as commit subject opener
+
+**flag-naming suffixes**: Manager, Handler, Processor, Service, Factory, Builder, Validator, Controller, Orchestrator, Coordinator
+
+**flag-naming identifier length**: >40 characters
+
+**strip-trailers AI emails**: noreply@anthropic.com, github-copilot[bot], copilot@github.com, devin-ai-integration[bot], cursor[bot], codeium[bot]
+
+**strip-trailers prefixes**: Generated-By:, Assisted-By:
+
+**flag-log-bracketing start words**: starting, begin, doing, processing, fetching, loading, connecting
+
+**flag-log-bracketing end words**: done, complete, completed, finished, processed, fetched, loaded, connected
+
+**strip-obvious-docstrings preserved tags**: @param, @returns, @throws, @example, @see, @deprecated, @since, @type
+
+For a machine-readable catalog: `dgent rules --json`
 
 ## Configuration
 

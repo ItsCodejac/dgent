@@ -16,6 +16,7 @@ import { registerFix } from "./commands/fix.js";
 import { registerDoctor } from "./commands/doctor.js";
 import { registerScan } from "./commands/scan.js";
 import { registerStats } from "./commands/stats.js";
+import { registerRules } from "./commands/rules.js";
 import { getBanner, VERSION } from "./ui/brand.js";
 
 const program = new Command();
@@ -40,6 +41,7 @@ registerIntegrate(program);
 registerScan(program);
 registerFix(program);
 registerStats(program);
+registerRules(program);
 registerDoctor(program);
 registerRage(program);
 registerHook(program);

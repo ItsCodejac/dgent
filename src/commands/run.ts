@@ -26,7 +26,8 @@ export function registerRun(program: Command): void {
     .option("--commit-msg", "Run commit message rules only")
     .option("--pre-commit", "Run pre-commit (code) rules only")
     .option("--json", "Output results as JSON (for agent/CI consumption)")
-    .action(async (file: string | undefined, options: { dryRun?: boolean; fix?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean }) => {
+    .option("--check", "Exit 0 if clean, 1 if flags, 2 if fixes — no output")
+    .action(async (file: string | undefined, options: { dryRun?: boolean; fix?: boolean; commitMsg?: boolean; preCommit?: boolean; json?: boolean; check?: boolean }) => {
       let input: string;
 
       if (file === "-" || !file) {
@@ -86,6 +87,17 @@ export function registerRun(program: Command): void {
         }
       }
 
+      // Auto-detect commit message from stdin: short, no code-like syntax
+      if (phase === "both" && (!file || file === "-")) {
+        const lines = input.split("\n").filter((l) => l.trim().length > 0);
+        const looksLikeCode = lines.some((l) =>
+          /^(import |export |const |let |var |function |class |def |if |for |while |return |from |#include)/.test(l.trimStart()),
+        );
+        if (lines.length <= 10 && !looksLikeCode) {
+          phase = "commit-msg";
+        }
+      }
+
       const config = loadConfig();
       const ignoreMap = parseIgnoreComments(input);
       let output = input;
@@ -97,7 +109,9 @@ export function registerRun(program: Command): void {
         return config.rules[r.name] ?? r.defaultEnabled;
       });
 
-      if (!options.json) {
+      const silent = options.json || options.check;
+
+      if (!silent) {
         const phaseLabel = phase === "both" ? "all rules" : `${phase} rules`;
         printCompact(`${dim(file ?? "stdin")} ${dim("·")} ${dim(phaseLabel)}`);
         console.error("");
@@ -109,16 +123,21 @@ export function registerRun(program: Command): void {
         if (result.changed) {
           output = result.output;
           fixResults.push({ rule: rule.name });
-          if (!options.json) printRuleResult(rule.name, "fixed");
+          if (!silent) printRuleResult(rule.name, "fixed");
         } else if (result.flags.length > 0) {
-          if (!options.json) printRuleResult(rule.name, "flagged");
+          if (!silent) printRuleResult(rule.name, "flagged");
         }
 
         const filtered = filterIgnoredFlags(result.flags, ignoreMap);
         for (const flag of filtered) {
           flagResults.push(flag);
-          if (!options.json) printFlag({ ...flag, file });
+          if (!silent) printFlag({ ...flag, file });
         }
+      }
+
+      if (options.check) {
+        process.exit(flagResults.length > 0 ? 1 : fixResults.length > 0 ? 2 : 0);
+        return;
       }
 
       if (options.json) {
