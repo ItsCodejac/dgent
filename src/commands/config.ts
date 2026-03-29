@@ -38,7 +38,19 @@ export function registerConfig(program: Command): void {
       console.log(formatConfigList(current));
     });
 
-  config.action(() => {
-    console.log("Interactive config editor not yet available. Use `dgent config list` and `dgent config set`.");
+  config.action(async () => {
+    if (process.stdout.isTTY) {
+      try {
+        const { renderConfig } = await import("../tui/render.js");
+        const current = loadConfig();
+        await renderConfig(current, (updated) => {
+          saveConfig(updated);
+        });
+        return;
+      } catch {
+        // Fall back to non-interactive
+      }
+    }
+    console.log("Use `dgent config list` and `dgent config set` to manage configuration.");
   });
 }
