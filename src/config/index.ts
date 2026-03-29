@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, chmodSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -94,6 +94,13 @@ export function loadConfig(): DgentConfig {
   // Apply per-repo overrides (only rules section)
   const overrides = loadRepoOverrides();
   if (overrides?.rules) {
+    // Warn about disabled rules (security-relevant: a malicious repo could disable all rules)
+    const disabledByOverride = Object.entries(overrides.rules)
+      .filter(([key, val]) => val === false && config.rules[key] === true);
+    if (disabledByOverride.length > 0 && process.env.DGENT_VERBOSE === "1") {
+      console.error(`dgent: .dgent.json disables ${disabledByOverride.length} rule(s): ${disabledByOverride.map(([k]) => k).join(", ")}`);
+    }
+
     config = {
       ...config,
       rules: { ...config.rules, ...overrides.rules },
@@ -105,7 +112,9 @@ export function loadConfig(): DgentConfig {
 
 export function saveConfig(config: DgentConfig): void {
   const configPath = getConfigPath();
-  mkdirSync(dirname(configPath), { recursive: true });
+  const dir = dirname(configPath);
+  mkdirSync(dir, { recursive: true });
+  try { chmodSync(dir, 0o700); } catch { /* best effort */ }
   writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
 }
 

@@ -8,6 +8,7 @@ const OVERRIDE_PATH = join(homedir(), ".config", "dgent", "skill.md");
 export function loadSkill(): string {
   // Check for user override first
   if (existsSync(OVERRIDE_PATH)) {
+    console.error("dgent: using custom skill override at " + OVERRIDE_PATH);
     return readFileSync(OVERRIDE_PATH, "utf-8");
   }
 

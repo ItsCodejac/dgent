@@ -16,9 +16,25 @@ export function registerConfig(program: Command): void {
         if (value === "" || value === "delete" || value === "remove") {
           deleteApiKey();
           console.log("API key removed.");
+        } else if (value === "-") {
+          // Read from stdin to avoid shell history exposure
+          let keyData = "";
+          process.stdin.setEncoding("utf-8");
+          process.stdin.on("data", (chunk) => { keyData += chunk; });
+          process.stdin.on("end", () => {
+            const trimmed = keyData.trim();
+            if (trimmed) {
+              storeApiKey(trimmed);
+              console.log("API key stored securely.");
+            } else {
+              console.error("No key provided via stdin.");
+            }
+          });
+          return;
         } else {
           storeApiKey(value);
           console.log("API key stored securely.");
+          console.log("Tip: use `echo $KEY | dgent config set api-key -` to avoid shell history.");
         }
         return;
       }
