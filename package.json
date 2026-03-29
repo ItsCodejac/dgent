@@ -58,11 +58,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cojac/dgent"
+    "url": "https://github.com/ItsCodejac/dgent"
   },
-  "homepage": "https://github.com/cojac/dgent",
+  "homepage": "https://github.com/ItsCodejac/dgent",
   "bugs": {
-    "url": "https://github.com/cojac/dgent/issues"
+    "url": "https://github.com/ItsCodejac/dgent/issues"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

@@ -1,6 +1,6 @@
 # dgent-mcp
 
-MCP server for [dgent](https://github.com/cojac/dgent) — de-agent your code via Model Context Protocol.
+MCP server for [dgent](https://github.com/ItsCodejac/dgent) — de-agent your code via Model Context Protocol.
 
 ## Prerequisites
 
