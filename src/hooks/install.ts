@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync, rmSync, chmodSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { printInitSuccess, printInitConflict, printUninstallSuccess, printSuccess, printWarning, printInfo } from "../ui/brand.js";
 import { dim, cyan, yellow } from "../ui/colors.js";
 
@@ -20,23 +20,35 @@ function isOwnedByDgent(hooksPath: string): boolean {
   return existsSync(join(hooksPath, ".dgent"));
 }
 
-const COMMIT_MSG_HOOK = `#!/bin/sh
-dgent hook commit-msg "$@" || true
-`;
+function getDgentPath(): string {
+  try {
+    return execFileSync("which", ["dgent"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+  } catch {
+    return "dgent"; // Fallback to PATH lookup
+  }
+}
 
-const PRE_COMMIT_HOOK = `#!/bin/sh
-dgent hook pre-commit "$@" || true
+function makeHookScript(type: string, dgentPath: string): string {
+  return `#!/bin/sh
+# dgent — de-agent your code
+DGENT="${dgentPath}"
+if ! command -v "$DGENT" >/dev/null 2>&1; then
+  DGENT="dgent"
+fi
+"$DGENT" hook ${type} "$@" || true
 `;
+}
 
 function writeHookScripts(): void {
   mkdirSync(HOOKS_DIR, { recursive: true });
+  const dgentPath = getDgentPath();
 
   const commitMsgPath = join(HOOKS_DIR, "commit-msg");
-  writeFileSync(commitMsgPath, COMMIT_MSG_HOOK, "utf-8");
+  writeFileSync(commitMsgPath, makeHookScript("commit-msg", dgentPath), "utf-8");
   chmodSync(commitMsgPath, 0o755);
 
   const preCommitPath = join(HOOKS_DIR, "pre-commit");
-  writeFileSync(preCommitPath, PRE_COMMIT_HOOK, "utf-8");
+  writeFileSync(preCommitPath, makeHookScript("pre-commit", dgentPath), "utf-8");
   chmodSync(preCommitPath, 0o755);
 
   writeFileSync(MARKER_FILE, `installed: ${new Date().toISOString()}\n`, "utf-8");

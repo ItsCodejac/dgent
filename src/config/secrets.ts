@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdirSync, unlinkSync, chmodSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
@@ -9,19 +9,18 @@ const LINUX_KEY_PATH = join(homedir(), ".local", "share", "dgent", ".key");
 export function storeApiKey(key: string): void {
   if (IS_MACOS) {
     try {
-      execSync(
-        `security add-generic-password -a dgent -s dgent-api-key -w "${key}" -U`,
-        { stdio: "pipe" },
-      );
+      execFileSync("security", [
+        "add-generic-password", "-a", "dgent", "-s", "dgent-api-key", "-w", key, "-U",
+      ], { stdio: "pipe" });
     } catch {
-      // -U flag should handle update, but if it fails try delete+add
       try {
-        execSync("security delete-generic-password -a dgent -s dgent-api-key", { stdio: "pipe" });
+        execFileSync("security", [
+          "delete-generic-password", "-a", "dgent", "-s", "dgent-api-key",
+        ], { stdio: "pipe" });
       } catch { /* may not exist */ }
-      execSync(
-        `security add-generic-password -a dgent -s dgent-api-key -w "${key}"`,
-        { stdio: "pipe" },
-      );
+      execFileSync("security", [
+        "add-generic-password", "-a", "dgent", "-s", "dgent-api-key", "-w", key,
+      ], { stdio: "pipe" });
     }
   } else {
     mkdirSync(dirname(LINUX_KEY_PATH), { recursive: true });
@@ -35,10 +34,9 @@ export function storeApiKey(key: string): void {
 export function loadStoredApiKey(): string | null {
   if (IS_MACOS) {
     try {
-      return execSync("security find-generic-password -a dgent -s dgent-api-key -w", {
-        encoding: "utf-8",
-        stdio: ["pipe", "pipe", "pipe"],
-      }).trim();
+      return execFileSync("security", [
+        "find-generic-password", "-a", "dgent", "-s", "dgent-api-key", "-w",
+      ], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
     } catch {
       return null;
     }
@@ -54,7 +52,9 @@ export function loadStoredApiKey(): string | null {
 export function deleteApiKey(): void {
   if (IS_MACOS) {
     try {
-      execSync("security delete-generic-password -a dgent -s dgent-api-key", { stdio: "pipe" });
+      execFileSync("security", [
+        "delete-generic-password", "-a", "dgent", "-s", "dgent-api-key",
+      ], { stdio: "pipe" });
     } catch { /* may not exist */ }
   } else {
     try {
@@ -64,9 +64,7 @@ export function deleteApiKey(): void {
 }
 
 export function getApiKey(): string | null {
-  // Env var takes precedence
   const envKey = process.env.ANTHROPIC_API_KEY;
   if (envKey) return envKey;
-
   return loadStoredApiKey();
 }

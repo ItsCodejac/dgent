@@ -6,7 +6,7 @@ import { rules } from "../rules/index.js";
 import type { Rule, Flag } from "../rules/index.js";
 import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { printCompact, printRuleResult, printFlag, printSuccess } from "../ui/brand.js";
-import { dim, green } from "../ui/colors.js";
+import { dim, green, cyan } from "../ui/colors.js";
 
 interface JsonResult {
   file: string | null;
@@ -30,6 +30,12 @@ export function registerRun(program: Command): void {
       let input: string;
 
       if (file === "-" || !file) {
+        if (!file && process.stdin.isTTY) {
+          console.error("Usage: dgent run <file> or pipe input via stdin");
+          console.error("  dgent run src/file.ts");
+          console.error("  cat file.ts | dgent run -");
+          process.exit(1);
+        }
         const chunks: Buffer[] = [];
         for await (const chunk of process.stdin) {
           chunks.push(chunk as Buffer);
@@ -144,8 +150,12 @@ export function registerRun(program: Command): void {
       if (output !== input && options.fix && file && file !== "-") {
         writeFileSync(file, output, "utf-8");
         printSuccess(`${file} fixed`);
-      } else if (output !== input && !options.dryRun && !options.fix) {
+      } else if (output !== input && !options.dryRun && (!file || file === "-")) {
+        // Stdin mode: write cleaned output to stdout (pipeable)
         process.stdout.write(output);
+      } else if (output !== input && !options.dryRun && !options.fix) {
+        // File mode without --fix: show as dry-run preview
+        console.error(`  ${dim("use")} ${cyan("--fix")} ${dim("to apply, or pipe:")} ${cyan(`dgent run ${file} --fix`)}`);
       } else if (options.dryRun && output !== input) {
         console.error(`  ${dim("dry-run — changes not applied")}`);
       }

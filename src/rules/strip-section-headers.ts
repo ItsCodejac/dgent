@@ -1,6 +1,6 @@
 import type { Rule, RuleResult } from "./index.js";
 
-const MAX_LINES = 100;
+const MAX_LINES = 500;
 
 // Matches comment lines that are purely decorative section headers
 // Examples: // --- Init ---, # ===== Setup =====, /* --- Config --- */

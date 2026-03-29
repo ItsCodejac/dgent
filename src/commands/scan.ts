@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import { readFileSync, writeFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { extname, relative } from "node:path";
 import { loadConfig } from "../config/index.js";
 import { rules } from "../rules/index.js";
@@ -44,15 +44,17 @@ export function registerScan(program: Command): void {
       // Get list of files from git or filesystem
       let files: string[];
       try {
-        files = execSync(`git ls-files --cached --others --exclude-standard "${targetDir}"`, {
-          encoding: "utf-8",
-        }).trim().split("\n").filter(Boolean);
+        files = execFileSync("git", [
+          "ls-files", "--cached", "--others", "--exclude-standard", targetDir,
+        ], { encoding: "utf-8" }).trim().split("\n").filter(Boolean);
       } catch {
-        // Not a git repo, fall back to find
         try {
-          files = execSync(`find "${targetDir}" -type f -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*"`, {
-            encoding: "utf-8",
-          }).trim().split("\n").filter(Boolean);
+          files = execFileSync("find", [
+            targetDir, "-type", "f",
+            "-not", "-path", "*/node_modules/*",
+            "-not", "-path", "*/.git/*",
+            "-not", "-path", "*/dist/*",
+          ], { encoding: "utf-8" }).trim().split("\n").filter(Boolean);
         } catch {
           files = [];
         }

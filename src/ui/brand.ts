@@ -1,7 +1,10 @@
+import { createRequire } from "node:module";
 import { bold, dim, cyan, green, red, yellow, gray, white } from "./colors.js";
 import type { Flag } from "../rules/index.js";
 
-const VERSION = "0.1.0";
+const require = createRequire(import.meta.url);
+const pkg = require("../../package.json") as { version: string };
+const VERSION = pkg.version;
 
 const LOGO = `
   ${bold(white("d"))}${cyan("gent")} ${dim("·")} ${gray("de-agent your code")}`;

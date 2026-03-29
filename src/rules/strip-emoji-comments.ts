@@ -30,16 +30,15 @@ export const stripEmojiComments: Rule = {
 
     const processed = lines.map((line) => {
       if (!isCommentLine(line)) return line;
+      EMOJI_REGEX.lastIndex = 0;
       if (!EMOJI_REGEX.test(line)) return line;
-
-      // Reset regex lastIndex
       EMOJI_REGEX.lastIndex = 0;
 
       let cleaned = line.replace(EMOJI_REGEX, "");
       cleaned = cleaned.replace(/ {2,}/g, " ");
 
       // If the comment part started with emoji + space, trim the leading space after comment marker
-      // e.g., "// ✅ Initialize" → "//  Initialize" → "// Initialize"
+ // e.g., "// Initialize" → "// Initialize" → "// Initialize"
       cleaned = cleaned.replace(/(\/\/|#)\s{2,}/, "$1 ");
 
       if (cleaned !== line) changed = true;

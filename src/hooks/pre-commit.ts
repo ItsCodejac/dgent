@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { extname } from "node:path";
 import { loadConfig } from "../config/index.js";
 import { getApiKey } from "../config/secrets.js";
@@ -39,7 +39,7 @@ function getStagedFiles(): string[] {
 
 function hasUnstagedChanges(file: string): boolean {
   try {
-    const output = execSync(`git diff --name-only -- "${file}"`, {
+    const output = execFileSync("git", ["diff", "--name-only", "--", file], {
       encoding: "utf-8",
     }).trim();
     return output.length > 0;
@@ -49,7 +49,7 @@ function hasUnstagedChanges(file: string): boolean {
 }
 
 function restage(file: string): void {
-  execSync(`git add "${file}"`);
+  execFileSync("git", ["add", file]);
 }
 
 export async function handlePreCommit(): Promise<void> {

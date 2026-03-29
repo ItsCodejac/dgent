@@ -22,6 +22,7 @@
   "publishConfig": {
     "provenance": true
   },
+  "os": ["darwin", "linux"],
   "engines": {
     "node": ">=18"
   },
