@@ -20,8 +20,9 @@ export async function callSkill<T>(
   const config = loadConfig();
 
   try {
+    const timeoutMs = 15000;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const message = await client.messages.parse({
+    const apiCall = client.messages.parse({
       model: config.ai.model as string,
       max_tokens: 4096,
       system: systemPrompt,
@@ -30,6 +31,12 @@ export async function callSkill<T>(
         format: jsonSchemaOutputFormat(schema as any),
       },
     });
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("AI request timed out after 15 seconds")), timeoutMs);
+    });
+
+    const message = await Promise.race([apiCall, timeoutPromise]);
 
     return message.parsed_output as T;
   } catch (err: unknown) {

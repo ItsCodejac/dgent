@@ -48,6 +48,24 @@ export function registerConfig(program: Command): void {
         console.warn(`Warning: unknown config key "${key}"`);
       }
 
+      // Validate values for known namespaces
+      if (key.startsWith("rules.")) {
+        if (value !== "true" && value !== "false") {
+          console.error(`Invalid value for ${key}: expected "true" or "false", got "${value}"`);
+          process.exit(1);
+        }
+      } else if (key === "ai.enabled" || key === "ai.autofix") {
+        if (value !== "true" && value !== "false") {
+          console.error(`Invalid value for ${key}: expected "true" or "false", got "${value}"`);
+          process.exit(1);
+        }
+      } else if (key === "ai.model") {
+        if (!value || value.trim().length === 0) {
+          console.error(`Invalid value for ${key}: expected a non-empty string`);
+          process.exit(1);
+        }
+      }
+
       const updated = setConfigValue(current, key, value);
       saveConfig(updated);
       const display = value === "true" ? true : value === "false" ? false : value;

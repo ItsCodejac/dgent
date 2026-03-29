@@ -11,7 +11,8 @@ import { hasConsented, promptConsent } from "./consent.js";
 import { parseIgnoreComments, filterIgnoredFlags } from "../rules/ignore.js";
 import { shouldIgnoreFile } from "../config/ignore-files.js";
 import { dim, green } from "../ui/colors.js";
-import { LOGO_COMPACT } from "../ui/brand.js";
+import { writeLog } from "./log-writer.js";
+import { LOGO_COMPACT, printDiff } from "../ui/brand.js";
 import { BINARY_EXTENSIONS } from "../utils/extensions.js";
 
 function isBinary(file: string): boolean {
@@ -121,6 +122,7 @@ export async function handlePreCommit(): Promise<void> {
     }
 
     const allFlags: Flag[] = [];
+    const allFixRules: string[] = [];
 
     for (const file of safeFiles) {
       let content: string;
@@ -152,6 +154,7 @@ export async function handlePreCommit(): Promise<void> {
           console.error(`[dry-run] ${file}:`);
           if (modified !== content) {
             console.error(`  Would modify (${rulesApplied.join(", ")})`);
+            printDiff(content, modified);
           }
           for (const flag of fileFlags) {
             console.error(`  Flag line ${flag.line}: ${flag.message}`);
@@ -163,6 +166,7 @@ export async function handlePreCommit(): Promise<void> {
       if (modified !== content) {
         writeFileSync(file, modified, "utf-8");
         restage(file);
+        allFixRules.push(...rulesApplied);
         if (config.output.verbose) {
           console.error(`dgent: modified ${file} (${rulesApplied.join(", ")})`);
         }
@@ -228,6 +232,11 @@ export async function handlePreCommit(): Promise<void> {
       for (const flag of allFlags) {
         console.error(`  ${flag.message}`);
       }
+    }
+
+    // Log both flags and fixes
+    if (!dryRun && (allFlags.length > 0 || allFixRules.length > 0)) {
+      writeLog(allFlags, undefined, allFixRules.length > 0 ? allFixRules : undefined);
     }
   } catch (err) {
     console.error(

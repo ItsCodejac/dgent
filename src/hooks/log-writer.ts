@@ -14,8 +14,8 @@ function getCommitHash(): string | null {
   }
 }
 
-export function writeLog(flags: Flag[], commit?: string): void {
-  if (flags.length === 0) return;
+export function writeLog(flags: Flag[], commit?: string, fixes?: string[]): void {
+  if (flags.length === 0 && (!fixes || fixes.length === 0)) return;
 
   try {
     mkdirSync(LOG_DIR, { recursive: true, mode: 0o700 });
@@ -24,7 +24,7 @@ export function writeLog(flags: Flag[], commit?: string): void {
     const ts = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
     const filename = `${ts}.json`;
 
-    const entry = {
+    const entry: Record<string, unknown> = {
       timestamp: now.toISOString(),
       commit: commit ?? getCommitHash(),
       flags: flags.map((f) => ({
@@ -34,6 +34,10 @@ export function writeLog(flags: Flag[], commit?: string): void {
         suggestion: f.suggestion,
       })),
     };
+
+    if (fixes && fixes.length > 0) {
+      entry.fixes = fixes;
+    }
 
     const logPath = join(LOG_DIR, filename);
     writeFileSync(logPath, JSON.stringify(entry, null, 2) + "\n", "utf-8");

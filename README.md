@@ -12,7 +12,7 @@ Your code just needs to be de-agented. dgent runs automatically via git hooks â€
 
 ## The problem
 
-AI agents speed up your workflow, but their output has tells:
+AI agents speed up your workflow, but their output has tells (mechanical patterns that agents add to code and commit messages):
 
 - `Co-Authored-By` trailers on every commit
 - Emoji prefixes on commit messages

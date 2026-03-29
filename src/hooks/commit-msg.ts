@@ -7,7 +7,7 @@ import { rules } from "../rules/index.js";
 import type { Flag } from "../rules/index.js";
 import { callSkill } from "../ai/client.js";
 import { loadSkill } from "../ai/skill-loader.js";
-import { LOGO_COMPACT, printFlag, printRuleResult, printDryRunHeader } from "../ui/brand.js";
+import { LOGO_COMPACT, printFlag, printRuleResult, printDryRunHeader, printDiff } from "../ui/brand.js";
 import { dim, yellow, green } from "../ui/colors.js";
 import { writeLog } from "./log-writer.js";
 
@@ -92,6 +92,9 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
     if (dryRun) {
       printDryRunHeader();
       for (const name of fixRules) printRuleResult(name, "fixed");
+      if (message !== original) {
+        printDiff(original, message);
+      }
       for (const flag of allFlags) printFlag(flag);
       console.error(`  ${dim("no changes applied")}`);
       return;
@@ -145,7 +148,11 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
     if (allFlags.length > 0) {
       console.error(`  ${LOGO_COMPACT()} ${yellow(`${allFlags.length} flag${allFlags.length > 1 ? "s" : ""}`)}`);
       for (const flag of allFlags) printFlag(flag);
-      writeLog(allFlags);
+    }
+
+    // Log both flags and fixes
+    if (allFlags.length > 0 || fixRules.length > 0) {
+      writeLog(allFlags, undefined, fixRules.length > 0 ? fixRules : undefined);
     }
   } catch (err) {
     console.error(`  ${LOGO_COMPACT()} ${dim(`error: ${err instanceof Error ? err.message : String(err)}`)}`);
