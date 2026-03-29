@@ -1,7 +1,7 @@
 {
   "name": "dgent",
   "version": "0.1.0",
-  "description": "Strip AI tells from agent output — commit trailers, noise comments, emoji, AI vocabulary, and more",
+  "description": "De-agent your code — clean AI tells from commits and code automatically via git hooks",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {

@@ -1,6 +1,6 @@
 # dgent integration
 
-dgent is installed on this machine. It strips AI tells from commits via git hooks.
+dgent (de-agent) is installed on this machine. It cleans AI tells from commits and code via git hooks.
 
 ## What it does automatically
 

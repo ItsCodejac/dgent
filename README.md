@@ -1,10 +1,8 @@
 ```
-  ┌─────────────────────────┐
-  │  dgent  · strip the tells │
-  └─────────────────────────┘
+  dgent · de-agent your code
 ```
 
-Post-process AI agent output to remove the mechanical tells that agents add to every commit. Runs automatically via git hooks — no workflow changes required.
+Your code just needs to be de-agented. dgent runs automatically via git hooks — cleaning commit messages and code before they land in your repo. No workflow changes required.
 
 ## The problem
 

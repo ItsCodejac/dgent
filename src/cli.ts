@@ -19,7 +19,7 @@ const program = new Command();
 
 program
   .name("dgent")
-  .description("Strip AI tells from agent output")
+  .description("De-agent your code")
   .version(VERSION)
   .addHelpText("beforeAll", () => {
     return getBanner();

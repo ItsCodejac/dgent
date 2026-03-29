@@ -1,8 +1,8 @@
 # dgent
 
-> Strip AI tells from agent output via git hooks.
+> De-agent your code.
 
-dgent is a CLI tool that post-processes AI agent commits. It runs automatically as a git hook, cleaning commit messages and staged files before they land in the repo. It removes mechanical tells like Co-Authored-By trailers, emoji, AI vocabulary, section header comments, and obvious naming patterns.
+dgent (de-agent) is a CLI tool that cleans AI agent output from commits and code. It runs automatically via git hooks, removing mechanical tells like Co-Authored-By trailers, emoji, AI vocabulary, section header comments, and obvious naming patterns before they land in the repo.
 
 ## Install
 
