@@ -10,7 +10,8 @@
   "files": [
     "dist/",
     "src/ai/skill.md",
-    "test/fixtures/"
+    "test/fixtures/",
+    "llms.txt"
   ],
   "scripts": {
     "build": "tsc",

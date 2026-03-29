@@ -1,0 +1,189 @@
+# dgent
+
+> Strip AI tells from agent output via git hooks.
+
+dgent is a CLI tool that post-processes AI agent commits. It runs automatically as a git hook, cleaning commit messages and staged files before they land in the repo. It removes mechanical tells like Co-Authored-By trailers, emoji, AI vocabulary, section header comments, and obvious naming patterns.
+
+## Install
+
+```
+npm install -g dgent
+dgent init
+```
+
+`dgent init` sets `core.hooksPath` globally. Every git commit on the machine now runs through dgent.
+
+## How it works
+
+Two git hooks:
+- `commit-msg`: modifies the commit message file (strip trailers, emojis, normalize format)
+- `pre-commit`: modifies staged files (strip section headers, emoji comments, flag naming patterns)
+
+Both hooks call `dgent hook <type> "$@" || true` — dgent never blocks a commit. On any error, the commit proceeds unmodified.
+
+## Rules
+
+### Commit message rules
+
+| Rule | Default | Type | Description |
+|---|---|---|---|
+| strip-trailers | on | fix | Removes Co-Authored-By, Generated-By, and AI attribution trailers. Preserves human co-author trailers. |
+| strip-emojis | on | fix | Removes emoji characters from commit messages. Preserves ASCII emoticons. |
+| flag-message-tone | on | flag | Warns about AI vocabulary: enhance, streamline, comprehensive, utilize, leverage, facilitate, robust, optimize. Also flags phrases: "this commit", "this change", "in order to", "aims to". Flags "Implement X to Y" as subject pattern. |
+| normalize-format | on | fix | Fixes conventional commit formatting: lowercase type, remove trailing period, ensure space after colon, lowercase first word (unless acronym like URL/API). Only acts on messages using conventional commit types (feat, fix, chore, docs, refactor, test, perf, ci, build, style, revert). |
+| rewrite-message | off | fix | Calls Claude API to rewrite the message matching the repo's historical commit voice. Requires API key and ai.enabled=true. |
+
+### Pre-commit rules (code)
+
+| Rule | Default | Type | Description |
+|---|---|---|---|
+| strip-section-headers | on | fix | Removes divider comments like `// --- Init ---` or `# ===== Setup =====` in files under 100 lines. |
+| strip-emoji-comments | on | fix | Strips emoji from code comments and docstrings. Does not modify emoji in string literals. |
+| flag-naming | on | flag | Flags identifiers ending with Manager, Handler, Processor, Service, Factory, Builder, Validator, Controller, Orchestrator, Coordinator on declaration lines. Also flags identifiers over 40 characters. |
+| flag-catch-rethrow | on | flag | Flags catch blocks that only contain console.log/error + throw with no added context. Does not flag catches that wrap errors, add metrics, or handle the error. |
+| strip-noise-comments | off | fix | Removes comments where 70%+ of meaningful words appear in the next line of code. Preserves comments with information not in the code. |
+| strip-obvious-docstrings | off | fix | Removes JSDoc on functions with ≤5 line bodies where the docstring restates the function name. Preserves docstrings with @param, @throws, @example tags. |
+| flag-log-bracketing | off | flag | Flags pairs of console.log statements within 5 lines that narrate start/end of an operation. |
+
+**Fix rules** modify code silently. **Flag rules** warn to stderr without modifying.
+
+## Configuration
+
+Global config: `~/.config/dgent/config.json`
+
+```json
+{
+  "rules": {
+    "strip-trailers": true,
+    "strip-emojis": true,
+    "strip-emoji-comments": true,
+    "strip-section-headers": true,
+    "normalize-format": true,
+    "flag-naming": true,
+    "flag-message-tone": true,
+    "flag-catch-rethrow": true,
+    "strip-noise-comments": false,
+    "strip-obvious-docstrings": false,
+    "flag-log-bracketing": false,
+    "flag-over-defensive": false,
+    "rewrite-message": false
+  },
+  "ai": {
+    "enabled": false,
+    "model": "claude-sonnet-latest",
+    "skill": "bundled"
+  },
+  "output": {
+    "verbose": false,
+    "log-dir": "~/.local/share/dgent/logs"
+  }
+}
+```
+
+### Setting config values
+
+```
+dgent config list                              # print all values
+dgent config set rules.strip-noise-comments true   # enable a rule
+dgent config set rules.flag-naming false           # disable a rule
+dgent config set ai.enabled true                   # enable AI layer
+dgent config set api-key <key>                     # store API key securely
+```
+
+Config values use dot notation. Boolean strings are auto-converted.
+
+### Per-repo overrides
+
+Place `.dgent.json` in the repo root. Only the `rules` section is overridable:
+
+```json
+{
+  "rules": {
+    "strip-noise-comments": true,
+    "flag-naming": false
+  }
+}
+```
+
+Repo overrides are merged on top of global config.
+
+## Commands
+
+```
+dgent init                    # install global git hooks
+dgent uninstall               # remove hooks, unset core.hooksPath
+dgent run <file>              # manual pass on a file (auto-detects phase from extension)
+dgent run - < file            # read from stdin
+dgent run --commit-msg <file> # force commit-msg rules
+dgent run --pre-commit <file> # force pre-commit rules
+dgent run --dry-run <file>    # preview without modifying
+dgent config list             # show current config
+dgent config set <k> <v>     # set a config value
+dgent review                  # show flags from last commit
+dgent log                     # show recent flag history
+dgent log --all               # show all flag history
+dgent test                    # run fixture suite (development)
+dgent test --rule <name>      # run fixtures for one rule
+dgent update                  # self-update via npm
+```
+
+## Dry-run mode
+
+Preview what dgent would do without modifying anything:
+
+```
+DGENT_DRY_RUN=1 git commit -m "your message"
+```
+
+Or for manual passes:
+
+```
+dgent run --dry-run <file>
+```
+
+## AI skill layer
+
+Optional. Requires an Anthropic API key.
+
+```
+dgent config set api-key <your-key>
+dgent config set ai.enabled true
+dgent config set rules.rewrite-message true
+```
+
+The API key is stored in macOS Keychain (via `security` CLI) or `~/.local/share/dgent/.key` on Linux. The `ANTHROPIC_API_KEY` environment variable takes precedence if set.
+
+The AI layer uses a bundled `skill.md` as the system prompt. Override it at `~/.config/dgent/skill.md`. The model is configurable via `ai.model`.
+
+The AI layer is additive — if no API key is present, it's skipped silently. The deterministic rules always run regardless.
+
+## Safety guarantees
+
+1. dgent never blocks a commit. All hooks use `|| true`. On any internal error, the commit proceeds unmodified.
+2. Files with mixed staged/unstaged changes are skipped entirely for diff transforms.
+3. First run prompts for consent before modifying any staged files. Non-interactive environments skip automatically.
+4. The rules engine targets sub-100ms execution.
+
+## Partial staging
+
+If a file has both staged and unstaged changes, dgent skips it for diff transforms and prints a warning. It does not attempt to merge or re-stage partial content. Commit message transforms are unaffected.
+
+## Hook conflict detection
+
+`dgent init` checks if `core.hooksPath` is already set. If it's set to a directory not owned by dgent (no `.dgent` marker file), init aborts and prints manual chaining instructions instead of overwriting.
+
+## Flag logging
+
+Flags from each commit are written to `~/.local/share/dgent/logs/` as JSON files. View with `dgent log` or `dgent review`.
+
+## Troubleshooting
+
+**dgent not running on commits:** Check `git config --global core.hooksPath` points to `~/.config/dgent/hooks/`.
+
+**Rule not firing:** Check `dgent config list` to verify the rule is enabled. Check `.dgent.json` in the repo root for overrides.
+
+**Want to skip dgent for one commit:** Use `git commit --no-verify`.
+
+**Want to see what dgent would do:** Use `DGENT_DRY_RUN=1 git commit -m "..."`.
+
+**Uninstall completely:** `dgent uninstall` removes hooks and unsets core.hooksPath.
