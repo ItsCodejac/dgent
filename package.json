@@ -49,6 +49,7 @@
     "javascript",
     "python"
   ],
+  "author": "Cojac <cojacproduction@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
