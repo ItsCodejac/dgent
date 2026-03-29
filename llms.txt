@@ -89,7 +89,6 @@ Global config: `~/.config/dgent/config.json`
     "strip-noise-comments": false,
     "strip-obvious-docstrings": false,
     "flag-log-bracketing": false,
-    "flag-over-defensive": false,
     "rewrite-message": false
   },
   "ai": {

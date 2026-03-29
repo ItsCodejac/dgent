@@ -8,8 +8,8 @@ import { dim } from "../ui/colors.js";
 
 export function registerTest(program: Command): void {
   program
-    .command("test")
-    .description("Run fixture suite")
+    .command("test", { hidden: true })
+    .description("Run fixture suite (development)")
     .option("--rule <name>", "Run fixtures for one rule")
     .option("--update", "Overwrite expected files with current output")
     .action(async (options: { rule?: string; update?: boolean }) => {

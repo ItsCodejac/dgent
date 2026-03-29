@@ -38,7 +38,9 @@ export function registerScan(program: Command): void {
     .description("Scan a directory for AI tells")
     .option("--fix", "Apply fixes in place")
     .option("--json", "Output results as JSON")
-    .action(async (dir: string | undefined, options: { fix?: boolean; json?: boolean }) => {
+    .option("--dry-run", "Show what --fix would change without writing")
+    .action(async (dir: string | undefined, options: { fix?: boolean; json?: boolean; dryRun?: boolean }) => {
+      if (options.dryRun) options.fix = false;
       const targetDir = dir ?? ".";
 
       // Get list of files from git or filesystem

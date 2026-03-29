@@ -93,7 +93,7 @@ function writeHookScripts(): void {
   try { chmodSync(HOOKS_DIR, 0o700); } catch { /* best effort */ }
 }
 
-export function installHooks(): void {
+export async function installHooks(skipConfirm = false): Promise<void> {
   const current = getCurrentHooksPath();
 
   if (current && !isOwnedByDgent(current)) {
@@ -105,6 +105,27 @@ export function installHooks(): void {
     writeHookScripts();
     printSuccess("Hooks updated.");
     return;
+  }
+
+  // First install — warn about global scope and confirm
+  if (!skipConfirm && process.stdin.isTTY) {
+    console.error("");
+    printWarning("This will set global core.hooksPath for ALL git repos on this machine.");
+    printInfo("Existing per-repo hooks (husky, lefthook, etc.) will be bypassed.");
+    printInfo("Use dgent uninstall to reverse this at any time.");
+    console.error("");
+
+    const { createInterface } = await import("node:readline");
+    const rl = createInterface({ input: process.stdin, output: process.stderr });
+    const answer = await new Promise<string>((resolve) => {
+      rl.question("  Install global hooks? (yes/no): ", resolve);
+    });
+    rl.close();
+
+    if (answer.trim().toLowerCase() !== "yes" && answer.trim().toLowerCase() !== "y") {
+      printInfo("Cancelled.");
+      return;
+    }
   }
 
   writeHookScripts();

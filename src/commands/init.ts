@@ -6,8 +6,9 @@ export function registerInit(program: Command): void {
   program
     .command("init")
     .description("Install global git hooks")
-    .action(async () => {
-      installHooks();
+    .option("-y, --yes", "Skip confirmation prompt")
+    .action(async (options: { yes?: boolean }) => {
+      await installHooks(options.yes);
       await showInitPreview();
     });
 }

@@ -70,6 +70,7 @@ function isWithinRepo(file: string, repoRoot: string): boolean {
 }
 
 export async function handlePreCommit(): Promise<void> {
+  if (process.env.DGENT_SKIP === "1") return;
   const dryRun = process.env.DGENT_DRY_RUN === "1";
 
   try {

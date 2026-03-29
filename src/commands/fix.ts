@@ -60,7 +60,7 @@ interface FixMessageResult {
 export function registerFix(program: Command): void {
   program
     .command("fix [file]")
-    .description("Use AI to fix flagged issues in a file or commit message")
+    .description("Use AI (Anthropic API) to fix flagged issues — requires API key")
     .option("--commit-msg", "Fix a commit message instead of code")
     .option("--dry-run", "Show fixes without applying")
     .action(async (file: string | undefined, options: { commitMsg?: boolean; dryRun?: boolean }) => {

@@ -36,6 +36,7 @@ interface FixMessageResult {
 }
 
 export async function handleCommitMsg(msgFilePath: string): Promise<void> {
+  if (process.env.DGENT_SKIP === "1") return;
   const dryRun = process.env.DGENT_DRY_RUN === "1";
 
   try {
