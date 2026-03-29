@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { handleCommitMsg } from "../hooks/commit-msg.js";
+import { handlePreCommit } from "../hooks/pre-commit.js";
 
 export function registerHook(program: Command): void {
   const hook = program
@@ -8,7 +9,7 @@ export function registerHook(program: Command): void {
     .argument("<type>", "hook type (commit-msg or pre-commit)")
     .argument("[args...]", "additional arguments passed by git")
     .allowUnknownOption()
-    .action((type: string, args: string[]) => {
+    .action(async (type: string, args: string[]) => {
       switch (type) {
         case "commit-msg": {
           const msgFile = args[0];
@@ -20,7 +21,7 @@ export function registerHook(program: Command): void {
           break;
         }
         case "pre-commit":
-          // Stub — implemented in Phase 4
+          await handlePreCommit();
           break;
         default:
           console.error(`dgent hook: unknown hook type "${type}"`);
