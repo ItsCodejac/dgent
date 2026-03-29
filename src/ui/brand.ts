@@ -115,6 +115,7 @@ export function printInitSuccess(hooksDir: string): void {
   console.error(LOGO());
   console.error(`  ${green("Hooks installed")} ${dim("→")} ${gray(hooksDir)}`);
   console.error(`  ${dim("dgent will clean every commit automatically.")}`);
+  console.error(`  ${dim(`v${VERSION} alpha —`)} ${dim("report issues at")} ${cyan("github.com/cojac/dgent")}`);
   console.error("");
 }
 

@@ -8,6 +8,8 @@
 
 Your code just needs to be de-agented. dgent runs automatically via git hooks — cleaning commit messages and code before they land in your repo. No workflow changes required.
 
+> **Alpha (v0.1.0)** — Actively developed. Core rules and hooks are stable. AI features, TUI, and some opt-in rules are still being refined. [Report issues](https://github.com/cojac/dgent/issues).
+>
 > **Platforms:** macOS, Linux. Windows is not supported.
 
 ## The problem
