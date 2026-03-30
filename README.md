@@ -4,7 +4,7 @@
 
 **De-agent your code.**
 
-[![npm](https://img.shields.io/npm/v/jent)](https://www.npmjs.com/package/jent) [![license](https://img.shields.io/npm/l/jent)](LICENSE) [![node](https://img.shields.io/node/v/jent)](package.json)
+[![npm](https://img.shields.io/npm/v/@itscojac/dgent)](https://www.npmjs.com/package/@itscojac/dgent) [![license](https://img.shields.io/npm/l/@itscojac/dgent)](LICENSE) [![node](https://img.shields.io/node/v/@itscojac/dgent)](package.json)
 
 Your code just needs to be de-agented. jent runs automatically via git hooks — cleaning commit messages and code before they land in your repo. No workflow changes required.
 
