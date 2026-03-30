@@ -4,7 +4,7 @@ import { join, dirname } from "node:path";
 import { execFileSync } from "node:child_process";
 import { DEFAULT_CONFIG } from "./defaults.js";
 
-export interface JentConfig {
+export interface DgentConfig {
   rules: Record<string, boolean>;
   ai: {
     enabled: boolean;
@@ -20,7 +20,7 @@ export interface JentConfig {
 }
 
 export function getConfigPath(): string {
-  return join(homedir(), ".config", "jent", "config.json");
+  return join(homedir(), ".config", "dgent", "config.json");
 }
 
 function deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
@@ -55,11 +55,11 @@ function getRepoRoot(): string | null {
   }
 }
 
-function loadRepoOverrides(): Partial<JentConfig> | null {
+function loadRepoOverrides(): Partial<DgentConfig> | null {
   const root = getRepoRoot();
   if (!root) return null;
 
-  const overridePath = join(root, ".jent.json");
+  const overridePath = join(root, ".dgent.json");
   if (!existsSync(overridePath)) return null;
 
   try {
@@ -70,9 +70,9 @@ function loadRepoOverrides(): Partial<JentConfig> | null {
   }
 }
 
-export function loadConfig(): JentConfig {
+export function loadConfig(): DgentConfig {
   const configPath = getConfigPath();
-  let config: JentConfig;
+  let config: DgentConfig;
 
   try {
     const raw = readFileSync(configPath, "utf-8");
@@ -80,7 +80,7 @@ export function loadConfig(): JentConfig {
     config = deepMerge(
       DEFAULT_CONFIG as unknown as Record<string, unknown>,
       parsed,
-    ) as unknown as JentConfig;
+    ) as unknown as DgentConfig;
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") {
       config = { ...DEFAULT_CONFIG };
@@ -95,12 +95,12 @@ export function loadConfig(): JentConfig {
   // Apply per-repo overrides
   const overrides = loadRepoOverrides();
 
-  // Warn about unknown keys in .jent.json
+  // Warn about unknown keys in .dgent.json
   if (overrides) {
     const ALLOWED_KEYS = new Set(["rules", "disabled"]);
     const unknownKeys = Object.keys(overrides).filter((k) => !ALLOWED_KEYS.has(k));
     if (unknownKeys.length > 0) {
-      console.error(`jent: .jent.json keys ignored (not overridable): ${unknownKeys.join(", ")}`);
+      console.error(`dgent: .dgent.json keys ignored (not overridable): ${unknownKeys.join(", ")}`);
     }
   }
 
@@ -113,8 +113,8 @@ export function loadConfig(): JentConfig {
     // Warn about disabled rules (security-relevant: a malicious repo could disable all rules)
     const disabledByOverride = Object.entries(overrides.rules)
       .filter(([key, val]) => val === false && config.rules[key] === true);
-    if (disabledByOverride.length > 0 && process.env.JENT_VERBOSE === "1") {
-      console.error(`jent: .jent.json disables ${disabledByOverride.length} rule(s): ${disabledByOverride.map(([k]) => k).join(", ")}`);
+    if (disabledByOverride.length > 0 && process.env.DGENT_VERBOSE === "1") {
+      console.error(`dgent: .dgent.json disables ${disabledByOverride.length} rule(s): ${disabledByOverride.map(([k]) => k).join(", ")}`);
     }
 
     config = {
@@ -126,7 +126,7 @@ export function loadConfig(): JentConfig {
   return config;
 }
 
-export function saveConfig(config: JentConfig): void {
+export function saveConfig(config: DgentConfig): void {
   const configPath = getConfigPath();
   const dir = dirname(configPath);
   mkdirSync(dir, { recursive: true });
@@ -134,7 +134,7 @@ export function saveConfig(config: JentConfig): void {
   writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
 }
 
-export function getConfigValue(config: JentConfig, key: string): unknown {
+export function getConfigValue(config: DgentConfig, key: string): unknown {
   const parts = key.split(".");
   let current: unknown = config;
   for (const part of parts) {
@@ -144,7 +144,7 @@ export function getConfigValue(config: JentConfig, key: string): unknown {
   return current;
 }
 
-export function setConfigValue(config: JentConfig, key: string, value: string): JentConfig {
+export function setConfigValue(config: DgentConfig, key: string, value: string): DgentConfig {
   const parts = key.split(".");
   const result = JSON.parse(JSON.stringify(config)) as Record<string, unknown>;
   let current = result;
@@ -167,7 +167,7 @@ export function setConfigValue(config: JentConfig, key: string, value: string): 
     current[lastKey] = value;
   }
 
-  return result as unknown as JentConfig;
+  return result as unknown as DgentConfig;
 }
 
 function flattenConfig(obj: Record<string, unknown>, prefix = ""): Array<[string, unknown]> {
@@ -183,7 +183,7 @@ function flattenConfig(obj: Record<string, unknown>, prefix = ""): Array<[string
   return entries;
 }
 
-export function formatConfigList(config: JentConfig): string {
+export function formatConfigList(config: DgentConfig): string {
   return flattenConfig(config as unknown as Record<string, unknown>)
     .map(([key, value]) => `${key}=${String(value)}`)
     .join("\n");

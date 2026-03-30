@@ -9,9 +9,9 @@ const SUBCOMMANDS = [
 const GLOBAL_FLAGS = ["--help", "--version", "--no-color"];
 
 function bashScript(): string {
-  return `# jent bash completion
-# Add to ~/.bashrc: eval "$(jent completions bash)"
-_jent_completions() {
+  return `# dgent bash completion
+# Add to ~/.bashrc: eval "$(dgent completions bash)"
+_dgent_completions() {
   local cur prev commands
   COMPREPLY=()
   cur="\${COMP_WORDS[COMP_CWORD]}"
@@ -19,7 +19,7 @@ _jent_completions() {
   commands="${SUBCOMMANDS.join(" ")}"
 
   case "\${prev}" in
-    jent)
+    dgent)
       COMPREPLY=( $(compgen -W "\${commands} ${GLOBAL_FLAGS.join(" ")}" -- "\${cur}") )
       return 0
       ;;
@@ -52,14 +52,14 @@ _jent_completions() {
 
   COMPREPLY=( $(compgen -W "\${commands}" -- "\${cur}") )
 }
-complete -F _jent_completions jent
+complete -F _dgent_completions dgent
 `;
 }
 
 function zshScript(): string {
-  return `# jent zsh completion
-# Add to ~/.zshrc: eval "$(jent completions zsh)"
-_jent() {
+  return `# dgent zsh completion
+# Add to ~/.zshrc: eval "$(dgent completions zsh)"
+_dgent() {
   local -a commands
   commands=(
 ${SUBCOMMANDS.map((c) => `    '${c}:${c} command'`).join("\n")}
@@ -74,7 +74,7 @@ ${SUBCOMMANDS.map((c) => `    '${c}:${c} command'`).join("\n")}
 
   case "\$state" in
     cmd)
-      _describe -t commands 'jent commands' commands
+      _describe -t commands 'dgent commands' commands
       ;;
     args)
       case "\$words[1]" in
@@ -101,39 +101,39 @@ ${SUBCOMMANDS.map((c) => `    '${c}:${c} command'`).join("\n")}
       ;;
   esac
 }
-compdef _jent jent
+compdef _dgent dgent
 `;
 }
 
 function fishScript(): string {
-  return `# jent fish completion
-# Add to ~/.config/fish/completions/jent.fish
-# Or run: jent completions fish > ~/.config/fish/completions/jent.fish
+  return `# dgent fish completion
+# Add to ~/.config/fish/completions/dgent.fish
+# Or run: dgent completions fish > ~/.config/fish/completions/dgent.fish
 
 # Disable file completions by default
-complete -c jent -f
+complete -c dgent -f
 
 # Subcommands
-${SUBCOMMANDS.map((c) => `complete -c jent -n '__fish_use_subcommand' -a '${c}' -d '${c} command'`).join("\n")}
+${SUBCOMMANDS.map((c) => `complete -c dgent -n '__fish_use_subcommand' -a '${c}' -d '${c} command'`).join("\n")}
 
 # Global flags
-complete -c jent -n '__fish_use_subcommand' -l help -d 'Show help'
-complete -c jent -n '__fish_use_subcommand' -l version -d 'Show version'
-complete -c jent -n '__fish_use_subcommand' -l no-color -d 'Disable color output'
+complete -c dgent -n '__fish_use_subcommand' -l help -d 'Show help'
+complete -c dgent -n '__fish_use_subcommand' -l version -d 'Show version'
+complete -c dgent -n '__fish_use_subcommand' -l no-color -d 'Disable color output'
 
 # scan flags
-complete -c jent -n '__fish_seen_subcommand_from scan' -l fix -d 'Apply fixes in place'
-complete -c jent -n '__fish_seen_subcommand_from scan' -l json -d 'Output results as JSON'
-complete -c jent -n '__fish_seen_subcommand_from scan' -l dry-run -d 'Show what fix would change'
+complete -c dgent -n '__fish_seen_subcommand_from scan' -l fix -d 'Apply fixes in place'
+complete -c dgent -n '__fish_seen_subcommand_from scan' -l json -d 'Output results as JSON'
+complete -c dgent -n '__fish_seen_subcommand_from scan' -l dry-run -d 'Show what fix would change'
 
 # config subcommands
-complete -c jent -n '__fish_seen_subcommand_from config' -a 'get set list' -d 'Config operation'
+complete -c dgent -n '__fish_seen_subcommand_from config' -a 'get set list' -d 'Config operation'
 
 # completions shells
-complete -c jent -n '__fish_seen_subcommand_from completions' -a 'bash zsh fish' -d 'Shell type'
+complete -c dgent -n '__fish_seen_subcommand_from completions' -a 'bash zsh fish' -d 'Shell type'
 
 # init flags
-complete -c jent -n '__fish_seen_subcommand_from init' -l force -d 'Force re-initialization'
+complete -c dgent -n '__fish_seen_subcommand_from init' -l force -d 'Force re-initialization'
 `;
 }
 

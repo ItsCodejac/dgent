@@ -14,7 +14,7 @@ export function registerHook(program: Command): void {
         case "commit-msg": {
           const msgFile = args[0];
           if (!msgFile) {
-            console.error("jent hook commit-msg: no message file provided");
+            console.error("dgent hook commit-msg: no message file provided");
             process.exit(0);
           }
           await handleCommitMsg(msgFile);
@@ -24,7 +24,7 @@ export function registerHook(program: Command): void {
           await handlePreCommit();
           break;
         default:
-          console.error(`jent hook: unknown hook type "${type}"`);
+          console.error(`dgent hook: unknown hook type "${type}"`);
       }
     });
 

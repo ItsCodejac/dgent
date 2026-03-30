@@ -6,7 +6,7 @@ import { storeApiKey, deleteApiKey } from "../config/secrets.js";
 export function registerConfig(program: Command): void {
   const config = program
     .command("config")
-    .description("Manage jent configuration");
+    .description("Manage dgent configuration");
 
   config
     .command("set <key> <value>")
@@ -35,7 +35,7 @@ export function registerConfig(program: Command): void {
         } else {
           storeApiKey(value);
           console.log("API key stored securely.");
-          console.log("Tip: use `echo $KEY | jent config set api-key -` to avoid shell history.");
+          console.log("Tip: use `echo $KEY | dgent config set api-key -` to avoid shell history.");
         }
         return;
       }
@@ -123,6 +123,6 @@ export function registerConfig(program: Command): void {
         // Fall back to non-interactive
       }
     }
-    console.log("Use `jent config list` and `jent config set` to manage configuration.");
+    console.log("Use `dgent config list` and `dgent config set` to manage configuration.");
   });
 }

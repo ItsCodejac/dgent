@@ -7,11 +7,11 @@ const pkg = require("../../package.json") as { version: string };
 const VERSION = pkg.version;
 
 function LOGO(): string {
-  return `\n  ${bold(white("j"))}${cyan("ent")} ${dim("·")} ${gray("de-agent your code")}`;
+  return `\n  ${bold(white("d"))}${cyan("gent")} ${dim("·")} ${gray("de-agent your code")}`;
 }
 
 function LOGO_COMPACT(): string {
-  return `${bold(white("j"))}${cyan("ent")}`;
+  return `${bold(white("d"))}${cyan("gent")}`;
 }
 
 export function printBanner(): void {
@@ -24,7 +24,7 @@ export function getBanner(): string {
 }
 
 export function printVersion(): void {
-  console.log(`jent v${VERSION}`);
+  console.log(`dgent v${VERSION}`);
 }
 
 export function printCompact(msg: string): void {
@@ -114,7 +114,7 @@ export function printDiff(before: string, after: string): void {
 export function printInitSuccess(hooksDir: string): void {
   console.error(LOGO());
   console.error(`  ${green("Hooks installed")} ${dim("→")} ${gray(hooksDir)}`);
-  console.error(`  ${dim("jent will clean every commit automatically.")}`);
+  console.error(`  ${dim("dgent will clean every commit automatically.")}`);
   console.error(`  ${dim(`v${VERSION} alpha —`)} ${dim("report issues at")} ${cyan("github.com/ItsCodejac/dgent")}`);
   console.error("");
 }
@@ -126,8 +126,8 @@ export function printInitConflict(existingPath: string): void {
   console.error("");
 
   const lowerPath = existingPath.toLowerCase();
-  const chainLine = 'jent hook commit-msg "$@" || true';
-  const chainLinePre = 'jent hook pre-commit "$@" || true';
+  const chainLine = 'dgent hook commit-msg "$@" || true';
+  const chainLinePre = 'dgent hook pre-commit "$@" || true';
 
   if (lowerPath.includes("husky")) {
     console.error(`  ${dim("Detected:")} ${bold(white("husky"))}`);
@@ -140,7 +140,7 @@ export function printInitConflict(existingPath: string): void {
     console.error(`  ${cyan(chainLinePre)}`);
   } else if (lowerPath.includes("lefthook")) {
     console.error(`  ${dim("Detected:")} ${bold(white("lefthook"))}`);
-    console.error(`  ${dim("Add jent as a command in your lefthook config:")}`);
+    console.error(`  ${dim("Add dgent as a command in your lefthook config:")}`);
     console.error("");
     console.error(`  ${dim("File:")} ${cyan("lefthook.yml")}`);
     console.error(`  ${dim("Under commit-msg/pre-commit hooks, add:")}`);
@@ -156,7 +156,7 @@ export function printInitConflict(existingPath: string): void {
     console.error(`  ${dim("File:")} ${cyan(`${existingPath}/pre-commit`)}`);
     console.error(`  ${cyan(chainLinePre)}`);
   } else {
-    console.error(`  ${dim("To use jent alongside existing hooks, add to your hook scripts:")}`);
+    console.error(`  ${dim("To use dgent alongside existing hooks, add to your hook scripts:")}`);
     console.error("");
     console.error(`  ${cyan(chainLine)}`);
     console.error(`  ${cyan(chainLinePre)}`);

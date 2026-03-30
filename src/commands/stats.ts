@@ -13,7 +13,7 @@ export function registerStats(program: Command): void {
       const entries = readLogs(options.all || options.since ? 100000 : 1000);
 
       if (entries.length === 0) {
-        printCompact(dim("no data yet — commit with jent active to start tracking"));
+        printCompact(dim("no data yet — commit with dgent active to start tracking"));
         return;
       }
 

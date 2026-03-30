@@ -1,11 +1,11 @@
 {
-  "name": "jent",
-  "version": "0.1.3",
+  "name": "@itscojac/dgent",
+  "version": "0.1.4",
   "description": "De-agent your code — clean AI tells from commits and code automatically via git hooks",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "jent": "dist/cli.js"
+    "dgent": "dist/cli.js"
   },
   "files": [
     "dist/",
@@ -18,7 +18,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "preuninstall": "jent uninstall 2>/dev/null || true"
+    "preuninstall": "dgent uninstall 2>/dev/null || true"
   },
   "publishConfig": {
     "access": "public"

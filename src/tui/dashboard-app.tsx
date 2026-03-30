@@ -4,11 +4,11 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import type { JentConfig } from "../config/index.js";
+import type { DgentConfig } from "../config/index.js";
 import type { LogEntry } from "../hooks/log-writer.js";
 
 interface DashboardProps {
-  config: JentConfig;
+  config: DgentConfig;
   logs: LogEntry[];
   version: string;
   onAction: (action: string) => void;
@@ -22,10 +22,10 @@ interface StatusInfo {
   aiEnabled: boolean;
 }
 
-function getStatus(config: JentConfig): StatusInfo {
-  const hooksDir = join(homedir(), ".config", "jent", "hooks");
-  const hooksInstalled = existsSync(join(hooksDir, ".jent"));
-  const consentGiven = existsSync(join(homedir(), ".config", "jent", "consent"));
+function getStatus(config: DgentConfig): StatusInfo {
+  const hooksDir = join(homedir(), ".config", "dgent", "hooks");
+  const hooksInstalled = existsSync(join(hooksDir, ".dgent"));
+  const consentGiven = existsSync(join(homedir(), ".config", "dgent", "consent"));
 
   const totalRules = Object.keys(config.rules).length;
   const enabledRules = Object.values(config.rules).filter(Boolean).length;
@@ -61,11 +61,11 @@ function getRecentCommits(count: number): RecentCommit[] {
 }
 
 const ACTIONS = [
-  { key: "scan", label: "Scan codebase", cmd: "jent scan" },
-  { key: "review", label: "Review last flags", cmd: "jent review" },
-  { key: "config", label: "Configure rules", cmd: "jent config" },
-  { key: "stats", label: "View stats", cmd: "jent stats" },
-  { key: "doctor", label: "Check setup", cmd: "jent doctor" },
+  { key: "scan", label: "Scan codebase", cmd: "dgent scan" },
+  { key: "review", label: "Review last flags", cmd: "dgent review" },
+  { key: "config", label: "Configure rules", cmd: "dgent config" },
+  { key: "stats", label: "View stats", cmd: "dgent stats" },
+  { key: "doctor", label: "Check setup", cmd: "dgent doctor" },
   { key: "quit", label: "Quit", cmd: "" },
 ];
 

@@ -4,7 +4,7 @@ import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
 import type { Flag } from "../rules/index.js";
 
-const LOG_DIR = join(homedir(), ".local", "share", "jent", "logs");
+const LOG_DIR = join(homedir(), ".local", "share", "dgent", "logs");
 
 function getCommitHash(): string | null {
   try {

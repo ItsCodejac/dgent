@@ -9,26 +9,26 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const TIMEOUT = 30_000;
 
-async function verifyJent(): Promise<void> {
+async function verifyDgent(): Promise<void> {
   try {
-    await execFileAsync("jent", ["--version"], { timeout: 5000 });
+    await execFileAsync("dgent", ["--version"], { timeout: 5000 });
   } catch {
-    console.error("jent-mcp: jent not found. Install with: npm install -g jent");
+    console.error("dgent-mcp: dgent not found. Install with: npm install -g @itscojac/dgent");
     process.exit(1);
   }
 }
 
-async function runJent(
+async function runDgent(
   args: string[],
   input?: string,
 ): Promise<{ stdout: string; stderr: string }> {
   try {
     const opts: Record<string, unknown> = { timeout: TIMEOUT, encoding: "utf-8" };
     if (input) opts.input = input;
-    const result = await execFileAsync("jent", args, opts);
+    const result = await execFileAsync("dgent", args, opts);
     return { stdout: result.stdout as string, stderr: result.stderr as string };
   } catch (err: unknown) {
-    // jent uses exit codes 1 (flags) and 2 (fixes) as valid results
+    // dgent uses exit codes 1 (flags) and 2 (fixes) as valid results
     if (err && typeof err === "object" && "stdout" in err) {
       const e = err as { stdout: string; stderr: string };
       return { stdout: e.stdout ?? "", stderr: e.stderr ?? "" };
@@ -61,13 +61,13 @@ function errorResult(context: string, err: unknown): ToolResult {
 }
 
 const server = new McpServer(
-  { name: "jent-mcp", version: "0.1.0" },
+  { name: "dgent-mcp", version: "0.1.0" },
   { capabilities: { logging: {} } },
 );
 
 // ── Check a file for AI tells ──────────────────────────────────────────
 server.registerTool(
-  "jent_check_file",
+  "dgent_check_file",
   {
     title: "Check File for AI Tells",
     description:
@@ -83,21 +83,21 @@ server.registerTool(
   },
   async ({ path }): Promise<ToolResult> => {
     try {
-      const { stdout } = await runJent(["run", "--json", "--pre-commit", path]);
+      const { stdout } = await runDgent(["run", "--json", "--pre-commit", path]);
       const parsed = tryParseJson(stdout);
       return {
         content: [{ type: "text" as const, text: parsed ? JSON.stringify(parsed, null, 2) : stdout }],
         structuredContent: parsed ?? undefined,
       };
     } catch (err) {
-      return errorResult(`Failed to check ${path}. Verify the file exists and jent is installed`, err);
+      return errorResult(`Failed to check ${path}. Verify the file exists and dgent is installed`, err);
     }
   },
 );
 
 // ── Check a commit message ─────────────────────────────────────────────
 server.registerTool(
-  "jent_check_message",
+  "dgent_check_message",
   {
     title: "Check Commit Message for AI Tells",
     description:
@@ -113,7 +113,7 @@ server.registerTool(
   },
   async ({ message }): Promise<ToolResult> => {
     try {
-      const { stdout } = await runJent(["run", "--json", "--commit-msg", "-"], message);
+      const { stdout } = await runDgent(["run", "--json", "--commit-msg", "-"], message);
       const parsed = tryParseJson(stdout);
       return {
         content: [{ type: "text" as const, text: parsed ? JSON.stringify(parsed, null, 2) : stdout }],
@@ -127,7 +127,7 @@ server.registerTool(
 
 // ── Scan a directory ───────────────────────────────────────────────────
 server.registerTool(
-  "jent_scan_directory",
+  "dgent_scan_directory",
   {
     title: "Scan Directory for AI Tells",
     description:
@@ -143,7 +143,7 @@ server.registerTool(
   },
   async ({ directory }): Promise<ToolResult> => {
     try {
-      const { stdout } = await runJent(["scan", "--json", directory]);
+      const { stdout } = await runDgent(["scan", "--json", directory]);
       const parsed = tryParseJson(stdout);
       return {
         content: [{ type: "text" as const, text: parsed ? JSON.stringify(parsed, null, 2) : stdout }],
@@ -157,11 +157,11 @@ server.registerTool(
 
 // ── Fix a file in place ────────────────────────────────────────────────
 server.registerTool(
-  "jent_fix_file",
+  "dgent_fix_file",
   {
     title: "Fix AI Tells in File",
     description:
-      "Apply deterministic fixes to a source file in place — strips section header comments, emoji from code comments, and other auto-fixable tells. Writes the cleaned content back to the file. Does NOT resolve flag rules (naming patterns, catch-rethrow) — those need manual fixes or the AI-powered 'jent fix' command.",
+      "Apply deterministic fixes to a source file in place — strips section header comments, emoji from code comments, and other auto-fixable tells. Writes the cleaned content back to the file. Does NOT resolve flag rules (naming patterns, catch-rethrow) — those need manual fixes or the AI-powered 'dgent fix' command.",
     inputSchema: {
       path: z.string().describe("Path to the file to fix in place"),
     },
@@ -174,9 +174,9 @@ server.registerTool(
   async ({ path }): Promise<ToolResult> => {
     try {
       // First apply fixes in place
-      await runJent(["run", "--fix", path]);
+      await runDgent(["run", "--fix", path]);
       // Then get the post-fix state as structured JSON
-      const { stdout } = await runJent(["run", "--json", "--pre-commit", path]);
+      const { stdout } = await runDgent(["run", "--json", "--pre-commit", path]);
       const parsed = tryParseJson(stdout);
       return {
         content: [{ type: "text" as const, text: parsed ? JSON.stringify(parsed, null, 2) : stdout }],
@@ -190,11 +190,11 @@ server.registerTool(
 
 // ── Get rule catalog ───────────────────────────────────────────────────
 server.registerTool(
-  "jent_get_rules",
+  "dgent_get_rules",
   {
-    title: "Get jent Rule Catalog",
+    title: "Get dgent Rule Catalog",
     description:
-      "Returns the complete catalog of all jent rules with: name, phase (commit-msg or pre-commit), type (fix or flag), enabled status, and full pattern lists (flagged words, naming suffixes, identifier length thresholds, trailer patterns). Use this to understand exactly what patterns to avoid when writing code.",
+      "Returns the complete catalog of all dgent rules with: name, phase (commit-msg or pre-commit), type (fix or flag), enabled status, and full pattern lists (flagged words, naming suffixes, identifier length thresholds, trailer patterns). Use this to understand exactly what patterns to avoid when writing code.",
     inputSchema: {},
     annotations: {
       readOnlyHint: true,
@@ -204,7 +204,7 @@ server.registerTool(
   },
   async (): Promise<ToolResult> => {
     try {
-      const { stdout } = await runJent(["rules", "--json"]);
+      const { stdout } = await runDgent(["rules", "--json"]);
       const parsed = tryParseJson(stdout);
       return {
         content: [{ type: "text" as const, text: parsed ? JSON.stringify(parsed, null, 2) : stdout }],
@@ -216,13 +216,13 @@ server.registerTool(
   },
 );
 
-// ── Get jent status ───────────────────────────────────────────────────
+// ── Get dgent status ───────────────────────────────────────────────────
 server.registerTool(
-  "jent_get_status",
+  "dgent_get_status",
   {
-    title: "Get jent Status",
+    title: "Get dgent Status",
     description:
-      "Check jent installation and configuration — git identity, hook status (installed/owned/tampered), consent status, API key presence, AI enabled, enabled/disabled rules, repo overrides, recent flag history. Use to verify setup or troubleshoot issues.",
+      "Check dgent installation and configuration — git identity, hook status (installed/owned/tampered), consent status, API key presence, AI enabled, enabled/disabled rules, repo overrides, recent flag history. Use to verify setup or troubleshoot issues.",
     inputSchema: {},
     annotations: {
       readOnlyHint: true,
@@ -232,22 +232,22 @@ server.registerTool(
   },
   async (): Promise<ToolResult> => {
     try {
-      const { stdout } = await runJent(["rage"]);
+      const { stdout } = await runDgent(["rage"]);
       return {
         content: [{ type: "text" as const, text: stdout }],
       };
     } catch (err) {
-      return errorResult("Failed to get status. Is jent installed?", err);
+      return errorResult("Failed to get status. Is dgent installed?", err);
     }
   },
 );
 
 // ── Start ──────────────────────────────────────────────────────────────
 async function main() {
-  await verifyJent();
+  await verifyDgent();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("jent-mcp server running on stdio");
+  console.error("dgent-mcp server running on stdio");
 }
 
 main().catch((error) => {

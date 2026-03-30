@@ -32,9 +32,9 @@ export function registerRage(program: Command): void {
     .action(() => {
       const config = loadConfig();
       const hooksPath = safeGit("config", "--global", "core.hooksPath");
-      const hooksDir = join(homedir(), ".config", "jent", "hooks");
-      const hasMarker = existsSync(join(hooksDir, ".jent"));
-      const hasConsent = existsSync(join(homedir(), ".config", "jent", "consent"));
+      const hooksDir = join(homedir(), ".config", "dgent", "hooks");
+      const hasMarker = existsSync(join(hooksDir, ".dgent"));
+      const hasConsent = existsSync(join(homedir(), ".config", "dgent", "consent"));
       const hasApiKey = getApiKey() !== null;
       const configPath = getConfigPath();
       const hasConfig = existsSync(configPath);
@@ -50,14 +50,14 @@ export function registerRage(program: Command): void {
       let repoOverride = "(none)";
       try {
         const root = safeGit("rev-parse", "--show-toplevel");
-        const overridePath = join(root, ".jent.json");
+        const overridePath = join(root, ".dgent.json");
         if (existsSync(overridePath)) {
           repoOverride = readFileSync(overridePath, "utf-8").trim();
         }
       } catch { /* not in a repo */ }
 
       const lines = [
-        `jent v${VERSION}`,
+        `dgent v${VERSION}`,
         ``,
         `## Git Identity`,
         `user.name: ${safeGit("config", "--global", "user.name")}`,
@@ -72,7 +72,7 @@ export function registerRage(program: Command): void {
         `## Installation`,
         `core.hooksPath: ${hooksPath}`,
         `Hooks dir exists: ${existsSync(hooksDir)}`,
-        `Owned by jent: ${hasMarker}`,
+        `Owned by dgent: ${hasMarker}`,
         `Consent given: ${hasConsent}`,
         ``,
         `## Configuration`,

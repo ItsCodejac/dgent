@@ -7,8 +7,8 @@ import { printInitSuccess, printInitConflict, printUninstallSuccess, printSucces
 import { dim, cyan, yellow } from "../ui/colors.js";
 import { deleteApiKey } from "../config/secrets.js";
 
-const HOOKS_DIR = join(homedir(), ".config", "jent", "hooks");
-const MARKER_FILE = join(HOOKS_DIR, ".jent");
+const HOOKS_DIR = join(homedir(), ".config", "dgent", "hooks");
+const MARKER_FILE = join(HOOKS_DIR, ".dgent");
 
 function getCurrentHooksPath(): string | null {
   try {
@@ -26,8 +26,8 @@ function hashFile(path: string): string {
   }
 }
 
-function isOwnedByJent(hooksPath: string): boolean {
-  const markerPath = join(hooksPath, ".jent");
+function isOwnedByDgent(hooksPath: string): boolean {
+  const markerPath = join(hooksPath, ".dgent");
   if (!existsSync(markerPath)) return false;
 
   // Verify integrity — check that hook scripts haven't been tampered with
@@ -40,10 +40,10 @@ function isOwnedByJent(hooksPath: string): boolean {
     const storedPreCommit = marker.match(/pre-commit: ([a-f0-9]+)/)?.[1];
 
     if (storedCommitMsg && storedCommitMsg !== commitMsgHash) {
-      printWarning("commit-msg hook has been modified outside jent");
+      printWarning("commit-msg hook has been modified outside dgent");
     }
     if (storedPreCommit && storedPreCommit !== preCommitHash) {
-      printWarning("pre-commit hook has been modified outside jent");
+      printWarning("pre-commit hook has been modified outside dgent");
     }
   } catch {
     // If we can't verify, still treat as owned (marker exists)
@@ -52,38 +52,38 @@ function isOwnedByJent(hooksPath: string): boolean {
   return true;
 }
 
-function getJentPath(): string {
+function getDgentPath(): string {
   const cmd = process.platform === "win32" ? "where" : "which";
   try {
-    const result = execFileSync(cmd, ["jent"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
+    const result = execFileSync(cmd, ["dgent"], { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim();
     // `where` on Windows can return multiple lines — take the first
     return result.split("\n")[0].trim();
   } catch {
-    return "jent";
+    return "dgent";
   }
 }
 
-function makeHookScript(type: string, jentPath: string): string {
+function makeHookScript(type: string, dgentPath: string): string {
   return `#!/bin/sh
-# jent — de-agent your code
-JENT="${jentPath}"
-if ! command -v "$JENT" >/dev/null 2>&1; then
-  JENT="jent"
+# dgent — de-agent your code
+DGENT="${dgentPath}"
+if ! command -v "$DGENT" >/dev/null 2>&1; then
+  DGENT="dgent"
 fi
-"$JENT" hook ${type} "$@" || true
+"$DGENT" hook ${type} "$@" || true
 `;
 }
 
 function writeHookScripts(): void {
   mkdirSync(HOOKS_DIR, { recursive: true });
-  const jentPath = getJentPath();
+  const dgentPath = getDgentPath();
 
   const commitMsgPath = join(HOOKS_DIR, "commit-msg");
-  writeFileSync(commitMsgPath, makeHookScript("commit-msg", jentPath), "utf-8");
+  writeFileSync(commitMsgPath, makeHookScript("commit-msg", dgentPath), "utf-8");
   chmodSync(commitMsgPath, 0o755);
 
   const preCommitPath = join(HOOKS_DIR, "pre-commit");
-  writeFileSync(preCommitPath, makeHookScript("pre-commit", jentPath), "utf-8");
+  writeFileSync(preCommitPath, makeHookScript("pre-commit", dgentPath), "utf-8");
   chmodSync(preCommitPath, 0o755);
 
   // Store hashes for integrity verification
@@ -100,12 +100,12 @@ function writeHookScripts(): void {
 export async function installHooks(skipConfirm = false): Promise<void> {
   const current = getCurrentHooksPath();
 
-  if (current && !isOwnedByJent(current)) {
+  if (current && !isOwnedByDgent(current)) {
     printInitConflict(current);
     process.exit(1);
   }
 
-  if (current && isOwnedByJent(current)) {
+  if (current && isOwnedByDgent(current)) {
     writeHookScripts();
     printSuccess("Hooks updated.");
     return;
@@ -116,7 +116,7 @@ export async function installHooks(skipConfirm = false): Promise<void> {
     console.error("");
     printWarning("This will set global core.hooksPath for ALL git repos on this machine.");
     printInfo("Existing per-repo hooks (husky, lefthook, etc.) will be bypassed.");
-    printInfo("Use jent uninstall to reverse this at any time.");
+    printInfo("Use dgent uninstall to reverse this at any time.");
     console.error("");
 
     const { createInterface } = await import("node:readline");
@@ -160,7 +160,7 @@ function checkGitIdentity(): void {
       console.error(`    ${dim("user.name =")} ${yellow(name)}`);
       console.error(`    ${dim("user.email =")} ${yellow(email)}`);
       console.error("");
-      console.error(`  ${dim("jent cleans commit content, but not git metadata.")}`);
+      console.error(`  ${dim("dgent cleans commit content, but not git metadata.")}`);
       console.error(`  ${dim("Fix with:")}`);
       console.error(`    ${cyan('git config --global user.name "Your Name"')}`);
       console.error(`    ${cyan('git config --global user.email "you@example.com"')}`);
@@ -182,9 +182,9 @@ export function uninstallHooks(options: { keepConfig?: boolean } = {}): void {
   const removed: string[] = [];
 
   if (!current) {
-    printInfo("jent hooks not installed (no core.hooksPath).");
-  } else if (!isOwnedByJent(current)) {
-    printInfo(`core.hooksPath set to ${current} — not managed by jent.`);
+    printInfo("dgent hooks not installed (no core.hooksPath).");
+  } else if (!isOwnedByDgent(current)) {
+    printInfo(`core.hooksPath set to ${current} — not managed by dgent.`);
   } else {
     try {
       rmSync(HOOKS_DIR, { recursive: true, force: true });
@@ -197,8 +197,8 @@ export function uninstallHooks(options: { keepConfig?: boolean } = {}): void {
     } catch { /* may already be unset */ }
   }
 
-  // Clean up ~/.config/jent/
-  const configDir = join(homedir(), ".config", "jent");
+  // Clean up ~/.config/dgent/
+  const configDir = join(homedir(), ".config", "dgent");
   if (existsSync(configDir)) {
     if (options.keepConfig) {
       // Remove everything except config.json
@@ -222,8 +222,8 @@ export function uninstallHooks(options: { keepConfig?: boolean } = {}): void {
     }
   }
 
-  // Clean up ~/.local/share/jent/ (logs)
-  const dataDir = join(homedir(), ".local", "share", "jent");
+  // Clean up ~/.local/share/dgent/ (logs)
+  const dataDir = join(homedir(), ".local", "share", "dgent");
   if (existsSync(dataDir)) {
     try {
       rmSync(dataDir, { recursive: true, force: true });
@@ -238,7 +238,7 @@ export function uninstallHooks(options: { keepConfig?: boolean } = {}): void {
   } catch { /* best effort */ }
 
   // Clean up Claude Code skills
-  const claudeSkillsDir = join(homedir(), ".claude", "skills", "jent");
+  const claudeSkillsDir = join(homedir(), ".claude", "skills", "dgent");
   if (existsSync(claudeSkillsDir)) {
     try {
       rmSync(claudeSkillsDir, { recursive: true, force: true });
@@ -247,7 +247,7 @@ export function uninstallHooks(options: { keepConfig?: boolean } = {}): void {
   }
 
   // Clean up OpenClaw skills
-  const openclawSkillsDir = join(homedir(), ".openclaw", "workspace", "skills", "jent");
+  const openclawSkillsDir = join(homedir(), ".openclaw", "workspace", "skills", "dgent");
   if (existsSync(openclawSkillsDir)) {
     try {
       rmSync(openclawSkillsDir, { recursive: true, force: true });

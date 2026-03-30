@@ -1,10 +1,10 @@
 {
-  "name": "jent-mcp",
+  "name": "dgent-mcp",
   "version": "0.1.0",
-  "description": "MCP server for jent — de-agent your code via Model Context Protocol",
+  "description": "MCP server for dgent — de-agent your code via Model Context Protocol",
   "type": "module",
   "bin": {
-    "jent-mcp": "./dist/index.js"
+    "dgent-mcp": "./dist/index.js"
   },
   "files": [
     "dist"
@@ -21,7 +21,7 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "jent",
+    "dgent",
     "ai",
     "agent",
     "git",

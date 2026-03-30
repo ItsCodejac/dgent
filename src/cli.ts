@@ -3,7 +3,7 @@
 // Node.js version check — must run before any imports that may use modern syntax
 const [major] = process.versions.node.split(".").map(Number);
 if (major < 18) {
-  console.error(`jent requires Node.js >= 18. You are running Node.js ${process.versions.node}.`);
+  console.error(`dgent requires Node.js >= 18. You are running Node.js ${process.versions.node}.`);
   process.exit(1);
 }
 
@@ -36,7 +36,7 @@ if (process.argv.includes("--no-color")) {
 const program = new Command();
 
 program
-  .name("jent")
+  .name("dgent")
   .description("De-agent your code")
   .version(VERSION)
   .option("--verbose", "Enable verbose output")
@@ -48,8 +48,8 @@ program
 
 program.hook("preAction", () => {
   const opts = program.opts();
-  if (opts.verbose) process.env.JENT_VERBOSE = "1";
-  if (opts.quiet) process.env.JENT_QUIET = "1";
+  if (opts.verbose) process.env.DGENT_VERBOSE = "1";
+  if (opts.quiet) process.env.DGENT_QUIET = "1";
   if (opts.color === false) process.env.NO_COLOR = "1";
 });
 

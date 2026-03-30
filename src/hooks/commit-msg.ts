@@ -36,8 +36,8 @@ interface FixMessageResult {
 }
 
 export async function handleCommitMsg(msgFilePath: string): Promise<void> {
-  if (process.env.JENT_SKIP === "1") return;
-  const dryRun = process.env.JENT_DRY_RUN === "1";
+  if (process.env.DGENT_SKIP === "1") return;
+  const dryRun = process.env.DGENT_DRY_RUN === "1";
 
   try {
     // Validate msg file path is within .git directory
@@ -48,7 +48,7 @@ export async function handleCommitMsg(msgFilePath: string): Promise<void> {
       }).trim();
       const resolvedGitDir = resolve(gitDir);
       if (!resolved.startsWith(resolvedGitDir)) {
-        console.error(`jent: message file ${msgFilePath} is outside .git directory, skipping`);
+        console.error(`dgent: message file ${msgFilePath} is outside .git directory, skipping`);
         return;
       }
     } catch {

@@ -1,6 +1,6 @@
-import type { JentConfig } from "./index.js";
+import type { DgentConfig } from "./index.js";
 
-export const DEFAULT_CONFIG: JentConfig = {
+export const DEFAULT_CONFIG: DgentConfig = {
   rules: {
     "strip-trailers": true,
     "strip-emojis": true,
@@ -23,6 +23,6 @@ export const DEFAULT_CONFIG: JentConfig = {
   },
   output: {
     verbose: false,
-    "log-dir": "~/.local/share/jent/logs",
+    "log-dir": "~/.local/share/dgent/logs",
   },
 };

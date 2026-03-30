@@ -1,17 +1,17 @@
-# jent
+# dgent
 
 > De-agent your code.
 
-jent (de-agent) is a CLI tool that cleans AI agent output from commits and code. It runs automatically via git hooks, removing mechanical tells like Co-Authored-By trailers, emoji, AI vocabulary, section header comments, and obvious naming patterns before they land in the repo.
+dgent (de-agent) is a CLI tool that cleans AI agent output from commits and code. It runs automatically via git hooks, removing mechanical tells like Co-Authored-By trailers, emoji, AI vocabulary, section header comments, and obvious naming patterns before they land in the repo.
 
 ## Install
 
 ```
-npm install -g jent
-jent init
+npm install -g @itscojac/dgent
+dgent init
 ```
 
-`jent init` sets `core.hooksPath` globally. Every git commit on the machine now runs through jent.
+`dgent init` sets `core.hooksPath` globally. Every git commit on the machine now runs through dgent.
 
 ## How it works
 
@@ -19,7 +19,7 @@ Two git hooks:
 - `commit-msg`: modifies the commit message file (strip trailers, emojis, normalize format)
 - `pre-commit`: modifies staged files (strip section headers, emoji comments, flag naming patterns)
 
-Both hooks call `jent hook <type> "$@" || true` — jent never blocks a commit. On any error, the commit proceeds unmodified.
+Both hooks call `dgent hook <type> "$@" || true` — dgent never blocks a commit. On any error, the commit proceeds unmodified.
 
 ## Rules
 
@@ -69,11 +69,11 @@ Both hooks call `jent hook <type> "$@" || true` — jent never blocks a commit. 
 
 **strip-obvious-docstrings preserved tags**: @param, @returns, @throws, @example, @see, @deprecated, @since, @type
 
-For a machine-readable catalog: `jent rules --json`
+For a machine-readable catalog: `dgent rules --json`
 
 ## Configuration
 
-Global config: `~/.config/jent/config.json`
+Global config: `~/.config/dgent/config.json`
 
 ```json
 {
@@ -98,7 +98,7 @@ Global config: `~/.config/jent/config.json`
   },
   "output": {
     "verbose": false,
-    "log-dir": "~/.local/share/jent/logs"
+    "log-dir": "~/.local/share/dgent/logs"
   }
 }
 ```
@@ -106,18 +106,18 @@ Global config: `~/.config/jent/config.json`
 ### Setting config values
 
 ```
-jent config list                              # print all values
-jent config set rules.strip-noise-comments true   # enable a rule
-jent config set rules.flag-naming false           # disable a rule
-jent config set ai.enabled true                   # enable AI layer
-jent config set api-key <key>                     # store API key securely
+dgent config list                              # print all values
+dgent config set rules.strip-noise-comments true   # enable a rule
+dgent config set rules.flag-naming false           # disable a rule
+dgent config set ai.enabled true                   # enable AI layer
+dgent config set api-key <key>                     # store API key securely
 ```
 
 Config values use dot notation. Boolean strings are auto-converted.
 
 ### Per-repo overrides
 
-Place `.jent.json` in the repo root. Only the `rules` section is overridable:
+Place `.dgent.json` in the repo root. Only the `rules` section is overridable:
 
 ```json
 {
@@ -133,43 +133,43 @@ Repo overrides are merged on top of global config.
 ## Commands
 
 ```
-jent init                    # install global git hooks
-jent uninstall               # remove hooks, unset core.hooksPath
-jent scan [dir]              # scan entire directory for tells
-jent scan --fix              # scan and auto-fix
-jent run <file>              # check a single file (auto-detects phase from extension)
-jent run --fix <file>        # fix in place
-jent run --json <file>       # structured output for agents/CI
-jent run - < file            # read from stdin
-jent fix <file>              # AI-powered fix for flags (requires API key)
-jent fix --commit-msg        # AI-powered commit message fix
-jent config                  # interactive config editor (TUI)
-jent config list             # show current config
-jent config set <k> <v>     # set a config value
-jent review                  # interactive flag review (TUI)
-jent stats                   # flag trends and breakdown
-jent log                     # raw flag history
-jent log --all               # show all flag history
-jent doctor                  # check setup and common issues
-jent integrate               # install Claude Code skills
-jent rage                    # print debug info for bug reports
-jent test                    # run fixture suite (development)
-jent test --rule <name>      # run fixtures for one rule
-jent update                  # self-update via npm
+dgent init                    # install global git hooks
+dgent uninstall               # remove hooks, unset core.hooksPath
+dgent scan [dir]              # scan entire directory for tells
+dgent scan --fix              # scan and auto-fix
+dgent run <file>              # check a single file (auto-detects phase from extension)
+dgent run --fix <file>        # fix in place
+dgent run --json <file>       # structured output for agents/CI
+dgent run - < file            # read from stdin
+dgent fix <file>              # AI-powered fix for flags (requires API key)
+dgent fix --commit-msg        # AI-powered commit message fix
+dgent config                  # interactive config editor (TUI)
+dgent config list             # show current config
+dgent config set <k> <v>     # set a config value
+dgent review                  # interactive flag review (TUI)
+dgent stats                   # flag trends and breakdown
+dgent log                     # raw flag history
+dgent log --all               # show all flag history
+dgent doctor                  # check setup and common issues
+dgent integrate               # install Claude Code skills
+dgent rage                    # print debug info for bug reports
+dgent test                    # run fixture suite (development)
+dgent test --rule <name>      # run fixtures for one rule
+dgent update                  # self-update via npm
 ```
 
 ## Dry-run mode
 
-Preview what jent would do without modifying anything:
+Preview what dgent would do without modifying anything:
 
 ```
-JENT_DRY_RUN=1 git commit -m "your message"
+DGENT_DRY_RUN=1 git commit -m "your message"
 ```
 
 Or for manual passes:
 
 ```
-jent run --dry-run <file>
+dgent run --dry-run <file>
 ```
 
 ## AI skill layer
@@ -177,14 +177,14 @@ jent run --dry-run <file>
 Optional. Requires an Anthropic API key.
 
 ```
-jent config set api-key <your-key>
-jent config set ai.enabled true
-jent config set rules.rewrite-message true
+dgent config set api-key <your-key>
+dgent config set ai.enabled true
+dgent config set rules.rewrite-message true
 ```
 
-The API key is stored in macOS Keychain (via `security` CLI) or `~/.local/share/jent/.key` on Linux. The `ANTHROPIC_API_KEY` environment variable takes precedence if set.
+The API key is stored in macOS Keychain (via `security` CLI) or `~/.local/share/dgent/.key` on Linux. The `ANTHROPIC_API_KEY` environment variable takes precedence if set.
 
-The AI layer uses a bundled `skill.md` as the system prompt. Override it at `~/.config/jent/skill.md`. The model is configurable via `ai.model`.
+The AI layer uses a bundled `skill.md` as the system prompt. Override it at `~/.config/dgent/skill.md`. The model is configurable via `ai.model`.
 
 The AI layer is additive — if no API key is present, it's skipped silently. The deterministic rules always run regardless.
 
@@ -193,7 +193,7 @@ The AI layer is additive — if no API key is present, it's skipped silently. Th
 With `ai.autofix` enabled, hooks automatically call Claude to resolve flags during commit:
 
 ```
-jent config set ai.autofix true
+dgent config set ai.autofix true
 ```
 
 Renames AI identifiers, removes empty catch-rethrow, cleans AI vocabulary from messages. If the AI call fails, flags print as warnings instead (never blocks).
@@ -201,9 +201,9 @@ Renames AI identifiers, removes empty catch-rethrow, cleans AI vocabulary from m
 ### Manual AI fix
 
 ```
-jent fix src/file.ts              # fix flagged code
-jent fix --commit-msg message.txt # fix flagged message
-jent fix --dry-run src/file.ts    # preview
+dgent fix src/file.ts              # fix flagged code
+dgent fix --commit-msg message.txt # fix flagged message
+dgent fix --dry-run src/file.ts    # preview
 ```
 
 ## Inline ignores
@@ -211,44 +211,44 @@ jent fix --dry-run src/file.ts    # preview
 Suppress specific flags with comments:
 
 ```
-// jent-ignore flag-naming
+// dgent-ignore flag-naming
 class DataProcessor { ... }           // not flagged
 
-// jent-ignore-next-line
+// dgent-ignore-next-line
 class UserServiceHandler { ... }      // not flagged
 
-const x = getValue(); // jent-ignore // ignore all rules on this line
+const x = getValue(); // dgent-ignore // ignore all rules on this line
 ```
 
-Supports `// jent-ignore`, `// jent-ignore-next-line`, `// jent-ignore <rule1> <rule2>`, and `#` for Python/shell.
+Supports `// dgent-ignore`, `// dgent-ignore-next-line`, `// dgent-ignore <rule1> <rule2>`, and `#` for Python/shell.
 
 ## Safety guarantees
 
-1. jent never blocks a commit. All hooks use `|| true`. On any internal error, the commit proceeds unmodified.
+1. dgent never blocks a commit. All hooks use `|| true`. On any internal error, the commit proceeds unmodified.
 2. Files with mixed staged/unstaged changes are skipped entirely for diff transforms.
 3. First run prompts for consent before modifying any staged files. Non-interactive environments skip automatically.
 4. The rules engine targets sub-100ms execution.
 
 ## Partial staging
 
-If a file has both staged and unstaged changes, jent skips it for diff transforms and prints a warning. It does not attempt to merge or re-stage partial content. Commit message transforms are unaffected.
+If a file has both staged and unstaged changes, dgent skips it for diff transforms and prints a warning. It does not attempt to merge or re-stage partial content. Commit message transforms are unaffected.
 
 ## Hook conflict detection
 
-`jent init` checks if `core.hooksPath` is already set. If it's set to a directory not owned by jent (no `.jent` marker file), init aborts and prints manual chaining instructions instead of overwriting.
+`dgent init` checks if `core.hooksPath` is already set. If it's set to a directory not owned by dgent (no `.dgent` marker file), init aborts and prints manual chaining instructions instead of overwriting.
 
 ## Flag logging
 
-Flags from each commit are written to `~/.local/share/jent/logs/` as JSON files. View with `jent log` or `jent review`.
+Flags from each commit are written to `~/.local/share/dgent/logs/` as JSON files. View with `dgent log` or `dgent review`.
 
 ## Troubleshooting
 
-**jent not running on commits:** Check `git config --global core.hooksPath` points to `~/.config/jent/hooks/`.
+**dgent not running on commits:** Check `git config --global core.hooksPath` points to `~/.config/dgent/hooks/`.
 
-**Rule not firing:** Check `jent config list` to verify the rule is enabled. Check `.jent.json` in the repo root for overrides.
+**Rule not firing:** Check `dgent config list` to verify the rule is enabled. Check `.dgent.json` in the repo root for overrides.
 
-**Want to skip jent for one commit:** Use `git commit --no-verify`.
+**Want to skip dgent for one commit:** Use `git commit --no-verify`.
 
-**Want to see what jent would do:** Use `JENT_DRY_RUN=1 git commit -m "..."`.
+**Want to see what dgent would do:** Use `DGENT_DRY_RUN=1 git commit -m "..."`.
 
-**Uninstall completely:** `jent uninstall` removes hooks and unsets core.hooksPath.
+**Uninstall completely:** `dgent uninstall` removes hooks and unsets core.hooksPath.

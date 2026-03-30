@@ -12,7 +12,7 @@ function resolveIntegrationsDir(): string {
   if (existsSync(primary)) return primary;
   const alt = join(__dirname, "..", "integrations");
   if (existsSync(alt)) return alt;
-  throw new Error("integrations directory not found — reinstall jent");
+  throw new Error("integrations directory not found — reinstall dgent");
 }
 
 export function registerIntegrate(program: Command): void {
@@ -28,7 +28,7 @@ export function registerIntegrate(program: Command): void {
       try {
         integrationsDir = resolveIntegrationsDir();
       } catch {
-        printCompact("integrations not found — reinstall jent");
+        printCompact("integrations not found — reinstall dgent");
         return;
       }
 
@@ -36,7 +36,7 @@ export function registerIntegrate(program: Command): void {
       if (installAll || options.claude) {
         const skillsSource = join(integrationsDir, "skills");
         if (existsSync(skillsSource)) {
-          const claudeSkills = join(homedir(), ".claude", "skills", "jent");
+          const claudeSkills = join(homedir(), ".claude", "skills", "dgent");
           mkdirSync(claudeSkills, { recursive: true });
 
           const skillFiles = readdirSync(skillsSource).filter((f) => f.endsWith(".md"));
@@ -51,7 +51,7 @@ export function registerIntegrate(program: Command): void {
       if (installAll || options.openclaw) {
         const openclawSource = join(integrationsDir, "openclaw");
         if (existsSync(openclawSource)) {
-          const openclawSkills = join(homedir(), ".openclaw", "workspace", "skills", "jent");
+          const openclawSkills = join(homedir(), ".openclaw", "workspace", "skills", "dgent");
           mkdirSync(openclawSkills, { recursive: true });
 
           const skillFiles = readdirSync(openclawSource).filter((f) => f.endsWith(".md"));
@@ -66,7 +66,7 @@ export function registerIntegrate(program: Command): void {
       const claudeMd = join(integrationsDir, "CLAUDE.md");
       if (existsSync(claudeMd) && (installAll || options.claude)) {
         console.error("");
-        printInfo("Add jent context to your project:");
+        printInfo("Add dgent context to your project:");
         console.error(`    ${cyan(`cat ${claudeMd} >> .claude/CLAUDE.md`)}`);
       }
 
